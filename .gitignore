@@ -9,7 +9,7 @@ src/assets/sprites/*
 *.o
 *.ppu
 src/backup/*
-src/assets/dglOpenGL.pas
+src/dglOpenGL.pas
 *.ico
 *.lpi
 *.compiled

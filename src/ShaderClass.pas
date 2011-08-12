@@ -1,1 +1,1 @@
-/home/maximo/workspace/SuperMaximo_GameFramework_Pascal/src/SuperMaximo_GameFramework/ShaderClass.pas
+/home/maximo/workspace/SuperMaximo_GameLibrary_Pascal/src/SuperMaximo_GameLibrary/ShaderClass.pas
