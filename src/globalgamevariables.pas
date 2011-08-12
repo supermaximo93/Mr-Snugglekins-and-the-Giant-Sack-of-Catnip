@@ -4,7 +4,8 @@ unit GlobalGameVariables;
 {$define NO_BUTTON_LIMIT}
 interface
 
-uses Classes, ShaderClass, TextureClass, GraphicalAssetClasses, FontClass, SoundClass, GameActorClass, CatClass, SackClass, SightClass, HudClass, SpambotClass;
+uses Classes, ShaderClass, TextureClass, GraphicalAssetClasses, FontClass, SoundClass,
+     GameActorClass, CatClass, SackClass, SightClass, HudClass, SpambotClass;
 
 const
   {$ifndef TOP_DOWN}
@@ -125,11 +126,17 @@ var
   lightningSprite : array[0..6] of PSprite;
   floorModel, catModel, catWithSpannerModel : PModel;
   floorObject : PGameObject;
-  spriteShader, shadowShader, modelShader, flatShader, lineShader, skeletonLineShader, fontShader, tintShader, dissolveShader, drainVerticalShader, drainHorizontalShader, tintAndWearShader,
-    alternateTextureShader : PShader;
+
+  spriteShader, shadowShader, modelShader, flatShader, lineShader, skeletonLineShader,
+    fontShader, tintShader, dissolveShader, drainVerticalShader, drainHorizontalShader,
+    tintAndWearShader,alternateTextureShader : PShader;
+
   tenneryBold, pictosWeb : PFont;
-  rotation, xDistance, yDistance, zDistance, skyXScale, skyYScale, euphoriaBuildup, turretHackTextWidthOverTwo, turretUpgradeTextWidthOverTwo, turretHealTextWidthOverTwo, turretHackingTextWidthOverTwo,
-    soundEffectsVolume, highScoreDisplayDelay : real;
+
+  rotation, xDistance, yDistance, zDistance, skyXScale, skyYScale, euphoriaBuildup,
+  turretHackTextWidthOverTwo, turretUpgradeTextWidthOverTwo, turretHealTextWidthOverTwo,
+  turretHackingTextWidthOverTwo, soundEffectsVolume, highScoreDisplayDelay : real;
+
   gameActors, collidables, spambots, turrets, spawnPoints, catSpawnPoints : TList;
   cat : PCat = nil;
   sack : PSack = nil;
@@ -173,13 +180,15 @@ procedure initLines;
 procedure freeLines;
 procedure drawLine(x, y, z, length, thickness, rotation, r, g, b, a : real);
 
-//Need to buffer 3D text and sprites so that they can be drawn after models, so that alpha blending works correctly
+//Need to buffer 3D text and sprites so that they can be drawn after models, so
+//that alpha blending works correctly
 procedure bufferText(text : string; x, y, z, originX, scale, r, g, b, a : real; fontToUse : PFont);
 procedure drawText;
 procedure bufferSprite(sprite : PSprite; x, y, z, scale, r, g, b, a : real);
 procedure drawSprites;
 
-function hitScan(x, z, rotation, maxLength : real; var actor : PGameActor; onlyEnemies : boolean = false; ignoreCat : boolean = false) : real;
+function hitScan(x, z, rotation, maxLength : real; var actor : PGameActor;
+         onlyEnemies : boolean = false; ignoreCat : boolean = false) : real;
 
 procedure setRespawnTimer;
 procedure respawn;
@@ -193,7 +202,8 @@ procedure randomDrop(x, z : real);
 
 implementation
 
-uses SysUtils, Math, dglOpenGL, Input, Display, Audio, MusicClass, SpawnPointClass, PickupClass, GunClass, ButtonClass, ExplosionClass, InitialisationAndFreeing;
+uses SysUtils, Math, dglOpenGL, Input, Display, Audio, MusicClass, SpawnPointClass,
+     PickupClass, GunClass, ButtonClass, ExplosionClass, InitialisationAndFreeing;
 
 type
   textBufferRecord = record
@@ -316,18 +326,15 @@ begin
 
     if (not collision) then
     begin
-      if ((-newXDistance > X_LOWER_BOUND) and (-newXDistance < X_UPPER_BOUND)) then xDistance := newXDistance;
-      if ((-newZDistance > Z_LOWER_BOUND) and (-newZDistance < Z_UPPER_BOUND)) then zDistance := newZDistance;
+      if ((-newXDistance > X_LOWER_BOUND) and (-newXDistance < X_UPPER_BOUND))
+         then xDistance := newXDistance;
+      if ((-newZDistance > Z_LOWER_BOUND) and (-newZDistance < Z_UPPER_BOUND))
+         then zDistance := newZDistance;
     end
   else
     begin
       tempGameActor := PGameActor(collidables[id]);
       if (not (up or down or left or right)) then cat^.pushed := true;
-      {if (tempGameActor^.isMoveable) then
-      begin
-        xDistance -= sin(degToRad(tempGameActor^.yRotation))*compensation*tempGameActor^.getSpeed;
-        zDistance -= cos(degToRad(tempGameActor^.yRotation))*compensation*tempGameActor^.getSpeed;
-      end;}
     end;
   end;
 end;
@@ -720,7 +727,10 @@ begin
   zDistance := -sack^.z+150;
   viewXRot := 30;
   rotation := -rotationToSack(-xDistance, -zDistance)+180;
-  for i := 0 to 7 do explosions.add(new(PExplosion, create(sack^.x-sin(degToRad(random(360)))*60, 20+random(60), sack^.z+cos(degToRad(random(360)))*60, 2)));
+  for i := 0 to 7 do explosions.add(new(PExplosion,
+      create(sack^.x-sin(degToRad(random(360)))*60, 20+random(60),
+      sack^.z+cos(degToRad(random(360)))*60, 2)));
+
   explosionSound^.play(round(25*soundEffectsVolume), 0);
   repeat
     drawStill(xDistance, yDistance, zDistance, viewXRot, rotation);
@@ -733,7 +743,10 @@ begin
   zDistance := -sack^.z-150;
   viewXRot := 30;
   rotation := -rotationToSack(-xDistance, -zDistance)+180;
-  for i := 0 to 7 do explosions.add(new(PExplosion, create(sack^.x-sin(degToRad(random(360)))*60, 20+random(60), sack^.z+cos(degToRad(random(360)))*60, 2)));
+  for i := 0 to 7 do explosions.add(new(PExplosion,
+      create(sack^.x-sin(degToRad(random(360)))*60, 20+random(60),
+      sack^.z+cos(degToRad(random(360)))*60, 2)));
+
   explosionSound^.play(round(25*soundEffectsVolume), 0);
   repeat
     drawStill(xDistance, yDistance, zDistance, viewXRot, rotation);
@@ -746,7 +759,10 @@ begin
   zDistance := -sack^.z+150;
   viewXRot := -20;
   rotation := -rotationToSack(-xDistance, -zDistance)+180;
-  for i := 0 to 7 do explosions.add(new(PExplosion, create(sack^.x-sin(degToRad(random(360)))*60, 20+random(60), sack^.z+cos(degToRad(random(360)))*60, 2)));
+  for i := 0 to 7 do explosions.add(new(PExplosion,
+      create(sack^.x-sin(degToRad(random(360)))*60, 20+random(60),
+      sack^.z+cos(degToRad(random(360)))*60, 2)));
+
   explosionSound^.play(round(25*soundEffectsVolume), 0);
   repeat
     drawStill(xDistance, yDistance, zDistance, viewXRot, rotation);
@@ -764,7 +780,10 @@ begin
   repeat
     if (timeSinceLastExplosion = 0) then
     begin
-      for i := 0 to 7 do explosions.add(new(PExplosion, create(sack^.x-sin(degToRad(random(360)))*60, 20+random(60), sack^.z+cos(degToRad(random(360)))*60, 2)));
+      for i := 0 to 7 do explosions.add(new(PExplosion,
+      create(sack^.x-sin(degToRad(random(360)))*60, 20+random(60),
+      sack^.z+cos(degToRad(random(360)))*60, 2)));
+
       explosionSound^.play(round((25*(1-(time/180)))*soundEffectsVolume), 0);
     end;
 
@@ -813,7 +832,8 @@ begin
       with gameOverChars[i] do
       begin
         y += compensation*2;
-        if (y > (screenHeight*0.5)-(textHeight*0.5)) then y := (screenHeight*0.5)-(textHeight*0.5) else fade := false;
+        if (y > (screenHeight*0.5)-(textHeight*0.5)) then y := (screenHeight*0.5)-(textHeight*0.5)
+           else fade := false;
         tenneryBold^.write(character, round(x), round(y), -1);
       end;
     end;
@@ -829,11 +849,21 @@ begin
   until time < 0;
 
   breakdownRecords[0].text := 'Score breakdown';
-  breakdownRecords[1].text := 'Drones: '+intToStr(SPAMBOT_REWARD[DRONE])+' x '+intToStr(spambotKills[DRONE])+' = '+intToStr(SPAMBOT_REWARD[DRONE]*spambotKills[DRONE]);
-  breakdownRecords[2].text := 'Hackers: '+intToStr(SPAMBOT_REWARD[HACKER])+' x '+intToStr(spambotKills[HACKER])+' = '+intToStr(SPAMBOT_REWARD[HACKER]*spambotKills[HACKER]);
-  breakdownRecords[3].text := 'Mechs: '+intToStr(SPAMBOT_REWARD[MECH])+' x '+intToStr(spambotKills[MECH])+' = '+intToStr(SPAMBOT_REWARD[MECH]*spambotKills[MECH]);
-  breakdownRecords[4].text := 'Enemy turrets: '+intToStr(TURRET_REWARD)+' x '+intToStr(turretKills[ENEMY_TURRET])+' = '+intToStr(TURRET_REWARD*turretKills[ENEMY_TURRET]);
-  breakdownRecords[5].text := 'Friendly turrets: '+intToStr(-TURRET_REWARD)+' x '+intToStr(turretKills[FRIENDLY_TURRET])+' = '+intToStr(-TURRET_REWARD*turretKills[FRIENDLY_TURRET]);
+  breakdownRecords[1].text := 'Drones: '+intToStr(SPAMBOT_REWARD[DRONE])+' x '
+    +intToStr(spambotKills[DRONE])+' = '+intToStr(SPAMBOT_REWARD[DRONE]*spambotKills[DRONE]);
+
+  breakdownRecords[2].text := 'Hackers: '+intToStr(SPAMBOT_REWARD[HACKER])+' x '
+    +intToStr(spambotKills[HACKER])+' = '+intToStr(SPAMBOT_REWARD[HACKER]*spambotKills[HACKER]);
+
+  breakdownRecords[3].text := 'Mechs: '+intToStr(SPAMBOT_REWARD[MECH])+' x '
+    +intToStr(spambotKills[MECH])+' = '+intToStr(SPAMBOT_REWARD[MECH]*spambotKills[MECH]);
+
+  breakdownRecords[4].text := 'Enemy turrets: '+intToStr(TURRET_REWARD)+' x '
+    +intToStr(turretKills[ENEMY_TURRET])+' = '+intToStr(TURRET_REWARD*turretKills[ENEMY_TURRET]);
+
+  breakdownRecords[5].text := 'Friendly turrets: '+intToStr(-TURRET_REWARD)+' x '
+    +intToStr(turretKills[FRIENDLY_TURRET])+' = '+intToStr(-TURRET_REWARD*turretKills[FRIENDLY_TURRET]);
+
   breakdownRecords[6].text := 'Total: '+intToStr(score);
 
   for i := 0 to 6 do
@@ -866,8 +896,10 @@ begin
           bipSound^.play(round(50*soundEffectsVolume));
           breakdownRecords[i].soundPlayed := true;
         end;
-        if (i = 0) then tenneryBold^.write(breakdownRecords[i].text, breakdownRecords[i].x, breakdownRecords[i].y, -1, true, 0, 0.6, 0.6)
-          else tenneryBold^.write(breakdownRecords[i].text, breakdownRecords[i].x, breakdownRecords[i].y, -1, true, 0, 0.5, 0.5);
+        if (i = 0) then tenneryBold^.write(breakdownRecords[i].text, breakdownRecords[i].x,
+           breakdownRecords[i].y, -1, true, 0, 0.6, 0.6)
+          else tenneryBold^.write(breakdownRecords[i].text, breakdownRecords[i].x,
+               breakdownRecords[i].y, -1, true, 0, 0.5, 0.5);
       end;
     end;
 
@@ -910,7 +942,8 @@ begin
           if (ord(name[currentChar]) < ord('A')) then name[currentChar] := 'Z';
           waitTime := 0;
         end;
-        if (currentChar > length(name)) then name += 'A' else if (currentChar < length(name)) then setLength(name, currentChar);
+        if (currentChar > length(name)) then name += 'A' else if (currentChar < length(name))
+           then setLength(name, currentChar);
       end else waitTime += compensation;
 
       tempStr := name;
@@ -986,7 +1019,8 @@ begin
 
     fontShader^.use;
     fontShader^.setUniform4(EXTRA0_LOCATION, 0.0, 0.0, 0.0, 1.0);
-    if (respawning) then tenneryBold^.write('RESPAWNING IN '+intToStr(timeLeftBeforeRespawn), 10, screenHeight-50, -1, false, 0, 0.8, 0.8);
+    if (respawning) then tenneryBold^.write('RESPAWNING IN '+intToStr(timeLeftBeforeRespawn),
+       10, screenHeight-50, -1, false, 0, 0.8, 0.8);
 
     hud^.update;
 
@@ -1061,7 +1095,8 @@ begin
     pushMatrix;
       translateMatrix(tSpriteDrawParams(data^).x, 0.1, tSpriteDrawParams(data^).depth);
       rotateMatrix(tSpriteDrawParams(data^).rotation, 0.0, 1.0, 0.0);
-      translateMatrix((-PSprite(pClass)^.width*tSpriteDrawParams(data^).xScale)/2, 0, (-PSprite(pClass)^.width*tSpriteDrawParams(data^).yScale)/2);
+      translateMatrix((-PSprite(pClass)^.width*tSpriteDrawParams(data^).xScale)/2, 0,
+        (-PSprite(pClass)^.width*tSpriteDrawParams(data^).yScale)/2);
       rotateMatrix(90, 1.0, 0.0, 0.0);
       scaleMatrix(tSpriteDrawParams(data^).xScale, tSpriteDrawParams(data^).yScale, 0.0);
 
@@ -1094,7 +1129,8 @@ begin
   {$ifdef NO_BUTTON_LIMIT}
   result := (keyPressed(ord('w')) or joystickDpadPressed(DPAD_UP));
   {$else}
-  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('w'))) or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickDpadPressed(DPAD_UP));
+  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('w')))
+         or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickDpadPressed(DPAD_UP));
   {$endif}
 end;
 
@@ -1103,7 +1139,8 @@ begin
   {$ifdef NO_BUTTON_LIMIT}
   result := (keyPressed(ord('s')) or joystickDpadPressed(DPAD_DOWN));
   {$else}
-  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('s'))) or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickDpadPressed(DPAD_DOWN));
+  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('s')))
+         or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickDpadPressed(DPAD_DOWN));
   {$endif}
 end;
 
@@ -1112,7 +1149,8 @@ begin
   {$ifdef NO_BUTTON_LIMIT}
   result := (keyPressed(ord('a')) or joystickDpadPressed(DPAD_LEFT));
   {$else}
-  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('a'))) or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickDpadPressed(DPAD_LEFT));
+  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('a')))
+         or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickDpadPressed(DPAD_LEFT));
   {$endif}
 end;
 
@@ -1121,7 +1159,8 @@ begin
   {$ifdef NO_BUTTON_LIMIT}
   result := (keyPressed(ord('d')) or joystickDpadPressed(DPAD_RIGHT));
   {$else}
-  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('d'))) or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickDpadPressed(DPAD_RIGHT));
+  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('d')))
+         or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickDpadPressed(DPAD_RIGHT));
   {$endif}
 end;
 
@@ -1139,7 +1178,8 @@ begin
     end;
   end;
   {$else}
-  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('l'))) or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickButtonPressed(1));
+  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('l')))
+         or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickButtonPressed(1));
   {$endif}
 end;
 
@@ -1157,7 +1197,8 @@ begin
     end;
   end;
   {$else}
-  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('j'))) or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickButtonPressed(2));
+  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('j')))
+         or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickButtonPressed(2));
   {$endif}
 end;
 
@@ -1166,13 +1207,15 @@ begin
   {$ifdef NO_BUTTON_LIMIT}
   result := (keyPressed(ord('i')) or joystickButtonPressed(5) or mouseLeft);
   {$else}
-  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('i'))) or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickButtonPressed(5));
+  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(ord('i')))
+         or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickButtonPressed(5));
   {$endif}
 end;
 
 function pause : boolean;
 begin
-  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(27)) or ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickButtonPressed(7));
+  result := ((configDetails[CONFIG_USING_CONTROLLER] = 0) and keyPressed(27)) or
+         ((configDetails[CONFIG_USING_CONTROLLER] = 1) and joystickButtonPressed(7));
 end;
 
 procedure startOutline;
@@ -1354,7 +1397,8 @@ begin
   tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);
 end;
 
-function hitScan(x, z, rotation, maxLength : real; var actor : PGameActor; onlyEnemies : boolean = false; ignoreCat : boolean = false) : real;
+function hitScan(x, z, rotation, maxLength : real; var actor : PGameActor;
+         onlyEnemies : boolean = false; ignoreCat : boolean = false) : real;
 var
   xVect, zVect, xPos, zPos, xDist, zDist, dist : real;
   i : integer;
@@ -1443,7 +1487,8 @@ end;
 procedure bindAlternateTexture(texture : PTexture);
 begin
   glActiveTexture(GL_TEXTURE1);
-  if (glSlVersion < 1.5) then glBindTexture(GL_TEXTURE_2D, texture^.texture) else glBindTexture(GL_TEXTURE_2D_ARRAY, texture^.texture);
+  if (glSlVersion < 1.5) then glBindTexture(GL_TEXTURE_2D, texture^.texture)
+     else glBindTexture(GL_TEXTURE_2D_ARRAY, texture^.texture);
   glActiveTexture(GL_TEXTURE0);
 end;
 

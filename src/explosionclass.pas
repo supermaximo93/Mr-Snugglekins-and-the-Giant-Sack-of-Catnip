@@ -7,11 +7,10 @@ interface
 uses GameActorClass;
 
 const
-  //VECTORS : array[0..7] of array[0..2] of integer = ((-1, 1, 1), (-1, 1, -1), (-1, -1, -1), (-1, -1, 1), (1, 1, 1), (1, 1, -1), (1, -1, -1), (1, -1, 1));
-  //VECTOR_LENGTH_TAKE_ONE = 7;
-  //VECTOR_LENGTH_TIMES_THREE_TAKE_ONE = 23;
-  VECTORS : array[0..13] of array[0..2] of integer = ((-1, 1, 1), (-1, 1, -1), (-1, -1, -1), (-1, -1, 1), (1, 1, 1), (1, 1, -1), (1, -1, -1), (1, -1, 1),
-                                                     (-1, 0, 0), (1, 0, 0), (0, -1, 0), (0, 1, 0), (0, 0, -1), (0, 0, 1));
+  VECTORS : array[0..13] of array[0..2] of integer =
+    ((-1, 1, 1), (-1, 1, -1), (-1, -1, -1), (-1, -1, 1), (1, 1, 1), (1, 1, -1),
+    (1, -1, -1), (1, -1, 1), (-1, 0, 0), (1, 0, 0), (0, -1, 0), (0, 1, 0), (0, 0, -1),
+    (0, 0, 1));
   VECTOR_LENGTH_TAKE_ONE = 13;
   VECTOR_LENGTH_TIMES_THREE_TAKE_ONE = 41;
 
@@ -111,7 +110,8 @@ begin
     particles[i].ySpeed -= compensation*0.02*particles[i].ySpeed;
     particles[i].zSpeed -= compensation*0.02*particles[i].zSpeed;
     particles[i].size -= compensation*0.07*particles[i].size;
-    if (visible_) then bufferSprite(smoke, particles[i].x, particles[i].y, particles[i].z, particles[i].size/5, 1.0, 1.0, 1.0, 1.0);
+    if (visible_) then bufferSprite(smoke, particles[i].x, particles[i].y, particles[i].z,
+       particles[i].size/5, 1.0, 1.0, 1.0, 1.0);
   end;
 end;
 
@@ -119,7 +119,8 @@ procedure TExplosion.pausedDraw;
 var
   i : integer;
 begin
-  for i := 0 to VECTOR_LENGTH_TIMES_THREE_TAKE_ONE do bufferSprite(smoke, particles[i].x, particles[i].y, particles[i].z, particles[i].size/5, 1.0, 1.0, 1.0, 1.0);
+  for i := 0 to VECTOR_LENGTH_TIMES_THREE_TAKE_ONE do bufferSprite(smoke, particles[i].x,
+      particles[i].y, particles[i].z, particles[i].size/5, 1.0, 1.0, 1.0, 1.0);
 end;
 
 end.

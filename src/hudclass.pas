@@ -95,21 +95,24 @@ begin
   bindFontShader(fontShader);
 
   if (money >= A_LOT_OF_MONEY) then tempStr := 'A lot!' else tempStr := '$'+intToStr(money);
-  tenneryBold^.write(tempStr, screenWidth-5-round(tenneryBold^.width(tempStr)*0.6), screenHeight-40, -1, false, 0, 0.6, 0.6);
+  tenneryBold^.write(tempStr, screenWidth-5-round(tenneryBold^.width(tempStr)*0.6),
+                              screenHeight-40, -1, false, 0, 0.6, 0.6);
 
   fontShader^.use;
   if (not cat^.gun^.isReloaded) then fontShader^.setUniform4(EXTRA0_LOCATION, 1.0, 0.3, 0.3, 1.0);
   clipSizeStr := '';
   if (cat^.gun^.getClipSize > 0) then for i := 1 to cat^.gun^.getClipSize do clipSizeStr += '|';
   if (clipSizeStr = '') then clipSizeStr := ' ';
-  tenneryBold^.write(clipSizeStr, screenWidth-235, screenHeight-53, -1, true, 0, 1/(tenneryBold^.width(clipSizeStr)/133));
+  tenneryBold^.write(clipSizeStr, screenWidth-235, screenHeight-53, -1, true, 0,
+                                  1/(tenneryBold^.width(clipSizeStr)/133));
 
   fontShader^.use;
   fontShader^.setUniform4(EXTRA0_LOCATION, 1.0, 1.0, 1.0, 1.0);
   tempStr := '';
   if (cat^.gun^.getClip > 0) then for i := 1 to cat^.gun^.getClip do tempStr += '|';
   if (tempStr = '') then tempStr := ' ';
-  tenneryBold^.write(tempStr, screenWidth-235, screenHeight-53, -1, true, 0, 1/(tenneryBold^.width(clipSizeStr)/133));
+  tenneryBold^.write(tempStr, screenWidth-235, screenHeight-53, -1, true, 0,
+                              1/(tenneryBold^.width(clipSizeStr)/133));
 
   scoreSprite^.draw(screenWidth-238, -15, -1);
   tempStr := 'Score: '+intToStr(score);

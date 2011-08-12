@@ -18,7 +18,8 @@ type
     x, y : integer;
     size: real;
   public
-    constructor create(newText : string; destX, destY : integer; newSelectionProcedure : TProcedure; newHoverProcedure : TProcedure = nil; newSize : real = 1.0);
+    constructor create(newText : string; destX, destY : integer; newSelectionProcedure : TProcedure;
+                newHoverProcedure : TProcedure = nil; newSize : real = 1.0);
     destructor destroy;
     procedure hover;
     procedure select;
@@ -76,7 +77,8 @@ begin
   if (money < KITTY_TURRET_PRICE) then exit;
 
   money -= KITTY_TURRET_PRICE;
-  tempTurret := new(PKittyTurret, create(-tempXDistance+(sin(degToRad(-tempRotation+180))*40), -tempZDistance+(cos(degToRad(-tempRotation+180))*40), -tempRotation-180));
+  tempTurret := new(PKittyTurret, create(-tempXDistance+(sin(degToRad(-tempRotation+180))*40),
+             -tempZDistance+(cos(degToRad(-tempRotation+180))*40), -tempRotation-180));
   gameActors.add(tempTurret);
 
   while (collision) do
@@ -97,7 +99,8 @@ begin
   end;
 
   shopkeeper^.talk(PURCHASE_SOUND);
-  floatText.add(new(PFloatText, create('-$'+intToStr(KITTY_TURRET_PRICE), 14, 25, 0, tenneryBold, 1.0, 0.0, 0.0)));
+  floatText.add(new(PFloatText, create('-$'+intToStr(KITTY_TURRET_PRICE), 14, 25, 0,
+                                tenneryBold, 1.0, 0.0, 0.0)));
 end;
 
 procedure buyAkatTurret;
@@ -109,7 +112,8 @@ begin
   if (money < AKAT_TURRET_PRICE) then exit;
 
   money -= AKAT_TURRET_PRICE;
-  tempTurret := new(PAkatTurret, create(-tempXDistance+(sin(degToRad(-tempRotation+180))*40), -tempZDistance+(cos(degToRad(-tempRotation+180))*40), -tempRotation-180));
+  tempTurret := new(PAkatTurret, create(-tempXDistance+(sin(degToRad(-tempRotation+180))*40),
+             -tempZDistance+(cos(degToRad(-tempRotation+180))*40), -tempRotation-180));
   gameActors.add(tempTurret);
 
   while (collision) do
@@ -130,7 +134,8 @@ begin
   end;
 
   shopkeeper^.talk(PURCHASE_SOUND);
-  floatText.add(new(PFloatText, create('-$'+intToStr(AKAT_TURRET_PRICE), 14, 25, 0, tenneryBold, 1.0, 0.0, 0.0)));
+  floatText.add(new(PFloatText, create('-$'+intToStr(AKAT_TURRET_PRICE), 14, 25, 0,
+                                tenneryBold, 1.0, 0.0, 0.0)));
 end;
 
 procedure buyKittyGun;
@@ -141,7 +146,8 @@ begin
   gameActors.add(new(PKittyGun, create(-tempXDistance, -tempZDistance)));
 
   shopkeeper^.talk(PURCHASE_SOUND);
-  floatText.add(new(PFloatText, create('-$'+intToStr(KITTYGUN_PRICE), 14, 25, 0, tenneryBold, 1.0, 0.0, 0.0)));
+  floatText.add(new(PFloatText, create('-$'+intToStr(KITTYGUN_PRICE), 14, 25, 0,
+                                tenneryBold, 1.0, 0.0, 0.0)));
 end;
 
 procedure buyAkat;
@@ -152,7 +158,8 @@ begin
   gameActors.add(new(PAkat, create(-tempXDistance, -tempZDistance)));
 
   shopkeeper^.talk(PURCHASE_SOUND);
-  floatText.add(new(PFloatText, create('-$'+intToStr(AKAT_PRICE), 14, 25, 0, tenneryBold, 1.0, 0.0, 0.0)));
+  floatText.add(new(PFloatText, create('-$'+intToStr(AKAT_PRICE), 14, 25, 0,
+                                tenneryBold, 1.0, 0.0, 0.0)));
 end;
 
 procedure buyBirdCatcher;
@@ -163,7 +170,8 @@ begin
   gameActors.add(new(PBirdCatcher, create(-tempXDistance, -tempZDistance)));
 
   shopkeeper^.talk(PURCHASE_SOUND);
-  floatText.add(new(PFloatText, create('-$'+intToStr(BIRDCATCHER_PRICE), 14, 25, 0, tenneryBold, 1.0, 0.0, 0.0)));
+  floatText.add(new(PFloatText, create('-$'+intToStr(BIRDCATCHER_PRICE), 14, 25, 0,
+                                tenneryBold, 1.0, 0.0, 0.0)));
 end;
 
 procedure buyAntiMech;
@@ -174,7 +182,8 @@ begin
   gameActors.add(new(PAntiMech, create(-tempXDistance, -tempZDistance)));
 
   shopkeeper^.talk(PURCHASE_SOUND);
-  floatText.add(new(PFloatText, create('-$'+intToStr(ANTIMECH_PRICE), 14, 25, 0, tenneryBold, 1.0, 0.0, 0.0)));
+  floatText.add(new(PFloatText, create('-$'+intToStr(ANTIMECH_PRICE), 14, 25, 0,
+                                tenneryBold, 1.0, 0.0, 0.0)));
 end;
 
 procedure highlightKittyTurret;
@@ -188,7 +197,8 @@ begin
     for i := 0 to items.count-1 do
     begin
       tempGameActor := PGameActor(items[i]);
-      if (tempGameActor^.name = TURRET_CHARACTER+'kittyTurret') then destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
+      if (tempGameActor^.name = TURRET_CHARACTER+'kittyTurret') then
+         destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
     end;
   end;
 end;
@@ -204,7 +214,8 @@ begin
     for i := 0 to items.count-1 do
     begin
       tempGameActor := PGameActor(items[i]);
-      if (tempGameActor^.name = TURRET_CHARACTER+'akatTurret') then destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
+      if (tempGameActor^.name = TURRET_CHARACTER+'akatTurret') then
+         destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
     end;
   end;
 end;
@@ -220,7 +231,8 @@ begin
     for i := 0 to items.count-1 do
     begin
       tempGameActor := PGameActor(items[i]);
-      if (tempGameActor^.name = 'Kitty Gun') then destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
+      if (tempGameActor^.name = 'Kitty Gun') then
+         destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
     end;
   end;
 end;
@@ -236,7 +248,8 @@ begin
     for i := 0 to items.count-1 do
     begin
       tempGameActor := PGameActor(items[i]);
-      if (tempGameActor^.name = 'A-KAT') then destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
+      if (tempGameActor^.name = 'A-KAT') then
+         destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
     end;
   end;
 end;
@@ -252,7 +265,8 @@ begin
     for i := 0 to items.count-1 do
     begin
       tempGameActor := PGameActor(items[i]);
-      if (tempGameActor^.name = 'Bird Catcher') then destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
+      if (tempGameActor^.name = 'Bird Catcher') then
+         destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
     end;
   end;
 end;
@@ -268,7 +282,8 @@ begin
     for i := 0 to items.count-1 do
     begin
       tempGameActor := PGameActor(items[i]);
-      if (tempGameActor^.name = 'Anti-Mech') then destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
+      if (tempGameActor^.name = 'Anti-Mech') then
+         destScale[i] := ITEM_HIGHLIGHT_SCALE else destScale[i] := ITEM_SCALE;
     end;
   end;
 end;
@@ -429,14 +444,19 @@ begin
     begin
       tempGameActor := PGameActor(items[i]);
 
-      if ((tempGameActor^.xScale > destScale[i]-compensation*0.2) and (tempGameActor^.xScale < destScale[i]+compensation*0.2)) then tempGameActor^.scale(destScale[i], destScale[i], destScale[i]) else
+      if ((tempGameActor^.xScale > destScale[i]-compensation*0.2) and
+         (tempGameActor^.xScale < destScale[i]+compensation*0.2)) then
+         tempGameActor^.scale(destScale[i], destScale[i], destScale[i]) else
       begin
-        if (tempGameActor^.xScale > destScale[i]) then tempGameActor^.scale(-compensation*0.1, -compensation*0.1, -compensation*0.1, true)
+        if (tempGameActor^.xScale > destScale[i]) then
+          tempGameActor^.scale(-compensation*0.1, -compensation*0.1, -compensation*0.1, true)
           else tempGameActor^.scale(compensation*0.1, compensation*0.1, compensation*0.1, true);
       end;
 
-      if (tempGameActor^.xScale > ITEM_HIGHLIGHT_SCALE) then tempGameActor^.rotate(0, 1, 0, true) else tempGameActor^.rotate(0, 20, 0);
-      if (tempGameActor^.name[1] <> TURRET_CHARACTER) then tempGameActor^.scale(tempGameActor^.xScale*2, tempGameActor^.yScale*2, tempGameActor^.zScale*2);
+      if (tempGameActor^.xScale > ITEM_HIGHLIGHT_SCALE) then tempGameActor^.rotate(0, 1, 0, true)
+         else tempGameActor^.rotate(0, 20, 0);
+      if (tempGameActor^.name[1] <> TURRET_CHARACTER) then
+        tempGameActor^.scale(tempGameActor^.xScale*2, tempGameActor^.yScale*2, tempGameActor^.zScale*2);
       tempGameActor^.draw(true, true);
     end;
 
@@ -455,7 +475,9 @@ begin
     begin
       tempGameActor := PGameActor(items[i]);
       tempGameActor^.draw(true, true);
-      if (tempGameActor^.name[1] <> TURRET_CHARACTER) then tempGameActor^.scale(tempGameActor^.xScale*0.5, tempGameActor^.yScale*0.5, tempGameActor^.zScale*0.5);
+      if (tempGameActor^.name[1] <> TURRET_CHARACTER) then
+        tempGameActor^.scale(tempGameActor^.xScale*0.5, tempGameActor^.yScale*0.5,
+                                                        tempGameActor^.zScale*0.5);
     end;
     stopOutline;
 
@@ -471,8 +493,10 @@ begin
 
     fontShader^.use;
     fontShader^.setUniform4(EXTRA0_LOCATION, 0.0, 0.0, 0.0, 1.0);
-    tenneryBold^.write(shopText, round((screenWidth*0.5)-(tenneryBold^.width(shopText)*0.5)), screenHeight-60, -1);
-    tenneryBold^.write('You have $'+intToStr(money), screenWidth-20-tenneryBold^.width('You have $'+intToStr(money)), 20, -1);
+    tenneryBold^.write(shopText, round((screenWidth*0.5)-(tenneryBold^.width(shopText)*0.5)),
+                                 screenHeight-60, -1);
+    tenneryBold^.write('You have $'+intToStr(money),
+      screenWidth-20-tenneryBold^.width('You have $'+intToStr(money)), 20, -1);
 
     refreshScreen;
   until (goBack and (time >= 80));
@@ -679,7 +703,8 @@ procedure selectButton;
 var
   tempButton : PButton;
 begin
-  if (buttonId >= buttons.count) then buttonId := 0 else if (buttonId < 0) then buttonId := buttons.count-1;
+  if (buttonId >= buttons.count) then buttonId := 0
+     else if (buttonId < 0) then buttonId := buttons.count-1;
   if (buttons.count > 0) then
   begin
     tempButton := PButton(buttons[buttonId]);
@@ -715,7 +740,8 @@ begin
   end else timeFromSelect += compensation;
 end;
 
-constructor TButton.create(newText : string; destX, destY : integer; newSelectionProcedure : TProcedure; newHoverProcedure : TProcedure = nil; newSize : real = 1.0);
+constructor TButton.create(newText : string; destX, destY : integer; newSelectionProcedure : TProcedure;
+            newHoverProcedure : TProcedure = nil; newSize : real = 1.0);
 begin
   text := newText;
   x := destX;
@@ -765,7 +791,8 @@ begin
   end else hovering := false;
   {$endif}
   fontShader^.use;
-  if (hovering) then fontShader^.setUniform4(EXTRA0_LOCATION, 0.7, 0.7, 0.7, 1.0) else fontShader^.setUniform4(EXTRA0_LOCATION, 0.9, 0.9, 0.9, 1.0);
+  if (hovering) then fontShader^.setUniform4(EXTRA0_LOCATION, 0.7, 0.7, 0.7, 1.0)
+     else fontShader^.setUniform4(EXTRA0_LOCATION, 0.9, 0.9, 0.9, 1.0);
   if (text = '') then text := ' ';
   tenneryBold^.write(text, x, y, -1, true, 0.0, size, size);
 end;

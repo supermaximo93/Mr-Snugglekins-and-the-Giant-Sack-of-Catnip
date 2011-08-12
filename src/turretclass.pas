@@ -11,7 +11,8 @@ type
   TTurret = object(TGameActor)
   protected
     fireLevel, rangeLevel, healthLevel : integer;
-    initialRotation, rateOfFire, lastShot, targetDistance, timeFromDamage, hackAmount, timeFromHack, timeFromHackCompletion, timeFromSmoke : real;
+    initialRotation, rateOfFire, lastShot, targetDistance, timeFromDamage, hackAmount,
+                     timeFromHack, timeFromHackCompletion, timeFromSmoke : real;
     shooting, rotationFlag, hacked, beingHacked, hackedThisFrame : boolean;
     target : PGameActor;
   public
@@ -55,7 +56,8 @@ procedure turretUpgradeMenu(turret : PTurret);
 
 implementation
 
-uses SysUtils, Math, Display, SoundClass, GraphicalAssetClasses, ShaderClass, GlobalGameVariables, BulletClass, ExplosionClass, FloatScoreClass, SpambotClass;
+uses SysUtils, Math, Display, SoundClass, GraphicalAssetClasses, ShaderClass,
+     GlobalGameVariables, BulletClass, ExplosionClass, FloatScoreClass, SpambotClass;
 
 var
   kittyTurretModel, akatTurretModel : PModel;
@@ -67,9 +69,11 @@ begin
   kittyTurretModel := new(PModel, create('turret', 'assets/models/kittyturret/', 'kittyturret.smo'));
   akatTurretModel := new(PModel, create('turret', 'assets/models/akatturret/', 'akatturret.smo'));
 
-  turretUpgradeSegment := new(PSprite, create('turretUpgradeSegment', 'assets/sprites/upgrade_segment.png', 1, 1, 150, 174, 1, 1, 0, 86));
+  turretUpgradeSegment := new(PSprite, create('turretUpgradeSegment',
+                       'assets/sprites/upgrade_segment.png', 1, 1, 150, 174, 1, 1, 0, 86));
   turretUpgradeSegment^.bindShader(fontShader);
-  turretUpgradeSegmentOverlay := new(PSprite, create('turretUpgradeSegmentOverlay', 'assets/sprites/upgrade_segment_overlay.png', 1, 1, 150, 174, 1, 1, 0, 86));
+  turretUpgradeSegmentOverlay := new(PSprite, create('turretUpgradeSegmentOverlay',
+                              'assets/sprites/upgrade_segment_overlay.png', 1, 1, 150, 174, 1, 1, 0, 86));
   turretUpgradeSegmentOverlay^.bindShader(spriteShader);
 
   hackedSound := new(PSound, create('hacked', 'assets/sounds/beep-09.ogg'));
@@ -93,14 +97,16 @@ const
   HEALTH_UPGRADE_ID = 2;
   HEALTH_REPLENISH_ID = 3;
   EXIT_ID = 4;
-  UPGRADE_TEXT : array[0..EXIT_ID] of string = ('Firepower upgrade', 'Range upgrade', 'Health upgrade', 'Heal 100 health', 'Exit');
+  UPGRADE_TEXT : array[0..EXIT_ID] of string = ('Firepower upgrade', 'Range upgrade',
+               'Health upgrade', 'Heal 100 health', 'Exit');
   UPGRADE_CHAR : array[0..EXIT_ID] of char = ('l', '''', 'y', 'k', '*');
 var
   upgradeId, i : integer;
   dist : array[0..EXIT_ID] of real = (180, 180, 180, 180, 180);
   destDist : array [0..EXIT_ID] of real = (0, 0, 0, 0, 0);
   stop : boolean = false;
-  r, g, b, tempXDistance, tempZDistance, tempRot, tempCatRot, tempCatX, tempCatZ, xDiff, zDiff, rot, timeFromSelect : real;
+  r, g, b, tempXDistance, tempZDistance, tempRot, tempCatRot, tempCatX, tempCatZ,
+     xDiff, zDiff, rot, timeFromSelect : real;
   tempStr : string;
 begin
   tempXDistance := xDistance;
@@ -127,12 +133,14 @@ begin
   whooshSound^.play(round(30*soundEffectsVolume));
 
   repeat
-    if ((xDistance > -turret^.x-compensation*2) and (xDistance < -turret^.x+compensation*2)) then xDistance := -turret^.x else
+    if ((xDistance > -turret^.x-compensation*2) and (xDistance < -turret^.x+compensation*2))
+       then xDistance := -turret^.x else
     begin
       if (xDistance < -turret^.x) then xDistance += compensation*0.8 else xDistance -= compensation*0.8;
     end;
 
-    if ((zDistance > -turret^.z-compensation*2) and (zDistance < -turret^.z+compensation*2)) then zDistance := -turret^.z else
+    if ((zDistance > -turret^.z-compensation*2) and (zDistance < -turret^.z+compensation*2))
+       then zDistance := -turret^.z else
     begin
       if (zDistance < -turret^.z) then zDistance += compensation*0.8 else zDistance -= compensation*0.8;
     end;
@@ -176,7 +184,8 @@ begin
       case upgradeId of
       FIRE_UPGRADE_ID :
         begin
-          if ((money >= FIRE_UPGRADE_PRICE*turret^.fireLevel) and (turret^.fireLevel < TURRET_MAX_LEVEL)) then
+          if ((money >= FIRE_UPGRADE_PRICE*turret^.fireLevel) and
+             (turret^.fireLevel < TURRET_MAX_LEVEL)) then
           begin
             money -= FIRE_UPGRADE_PRICE;
             turret^.fireLevelUp;
@@ -185,7 +194,8 @@ begin
         end;
       RANGE_UPGRADE_ID :
         begin
-          if ((money >= RANGE_UPGRADE_PRICE*turret^.rangeLevel) and (turret^.rangeLevel < TURRET_MAX_LEVEL)) then
+          if ((money >= RANGE_UPGRADE_PRICE*turret^.rangeLevel) and
+             (turret^.rangeLevel < TURRET_MAX_LEVEL)) then
           begin
             money -= RANGE_UPGRADE_PRICE;
             turret^.rangeLevelUp;
@@ -194,7 +204,8 @@ begin
         end;
       HEALTH_UPGRADE_ID :
         begin
-          if ((money >= HEALTH_UPGRADE_PRICE*turret^.healthLevel) and (turret^.healthLevel < TURRET_MAX_LEVEL)) then
+          if ((money >= HEALTH_UPGRADE_PRICE*turret^.healthLevel) and
+             (turret^.healthLevel < TURRET_MAX_LEVEL)) then
           begin
             money -= HEALTH_UPGRADE_PRICE;
             turret^.healthLevelUp;
@@ -225,7 +236,8 @@ begin
       case i of
       FIRE_UPGRADE_ID :
         begin
-          if ((money >= FIRE_UPGRADE_PRICE*turret^.fireLevel) and (turret^.fireLevel < TURRET_MAX_LEVEL)) then
+          if ((money >= FIRE_UPGRADE_PRICE*turret^.fireLevel) and
+             (turret^.fireLevel < TURRET_MAX_LEVEL)) then
           begin
             r := 1.0;
             g := 0.5;
@@ -233,12 +245,14 @@ begin
           end;
           tempStr := intToStr(turret^.getFireLevel);
           if (upgradeId = FIRE_UPGRADE_ID) then destDist[i] := 210;
-          tenneryBold^.write(tempStr, round((screenWidth/2)+sin(degToRad(i*72+252))*dist[i]-(tenneryBold^.width(tempStr)/2)),
+          tenneryBold^.write(tempStr,
+            round((screenWidth/2)+sin(degToRad(i*72+252))*dist[i]-(tenneryBold^.width(tempStr)/2)),
             round((screenHeight/2)-cos(degToRad(i*72+252))*dist[i]-(tenneryBold^.height(tempStr)/2)), -1);
         end;
       RANGE_UPGRADE_ID :
         begin
-          if ((money >= RANGE_UPGRADE_PRICE*turret^.rangeLevel) and (turret^.rangeLevel < TURRET_MAX_LEVEL)) then
+          if ((money >= RANGE_UPGRADE_PRICE*turret^.rangeLevel) and
+             (turret^.rangeLevel < TURRET_MAX_LEVEL)) then
           begin
             r := 0.0;
             g := 0.0;
@@ -246,12 +260,14 @@ begin
           end;
           tempStr := intToStr(turret^.getRangeLevel);
           if (upgradeId = RANGE_UPGRADE_ID) then destDist[i] := 210;
-          tenneryBold^.write(tempStr, round((screenWidth/2)+sin(degToRad(i*72+252))*dist[i]-(tenneryBold^.width(tempStr)/2)),
+          tenneryBold^.write(tempStr,
+            round((screenWidth/2)+sin(degToRad(i*72+252))*dist[i]-(tenneryBold^.width(tempStr)/2)),
             round((screenHeight/2)-cos(degToRad(i*72+252))*dist[i]-(tenneryBold^.height(tempStr)/2)), -1);
         end;
       HEALTH_UPGRADE_ID :
         begin
-          if ((money >= HEALTH_UPGRADE_PRICE*turret^.healthLevel) and (turret^.healthLevel < TURRET_MAX_LEVEL)) then
+          if ((money >= HEALTH_UPGRADE_PRICE*turret^.healthLevel)
+             and (turret^.healthLevel < TURRET_MAX_LEVEL)) then
           begin
             r := 0.0;
             g := 1.0;
@@ -259,7 +275,8 @@ begin
           end;
           tempStr := intToStr(turret^.getHealthLevel);
           if (upgradeId = HEALTH_UPGRADE_ID) then destDist[i] := 210;
-          tenneryBold^.write(tempStr, round((screenWidth/2)+sin(degToRad(i*72+252))*dist[i]-(tenneryBold^.width(tempStr)/2)),
+          tenneryBold^.write(tempStr,
+            round((screenWidth/2)+sin(degToRad(i*72+252))*dist[i]-(tenneryBold^.width(tempStr)/2)),
             round((screenHeight/2)-cos(degToRad(i*72+252))*dist[i]-(tenneryBold^.height(tempStr)/2)), -1);
         end;
       HEALTH_REPLENISH_ID :
@@ -272,7 +289,8 @@ begin
           end;
           tempStr := intToStr(round(turret^.getHealth));
           if (upgradeId = HEALTH_REPLENISH_ID) then destDist[i] := 210;
-          tenneryBold^.write(tempStr, round((screenWidth/2)+sin(degToRad(i*72+252))*dist[i]-(tenneryBold^.width(tempStr[1])/2)),
+          tenneryBold^.write(tempStr,
+            round((screenWidth/2)+sin(degToRad(i*72+252))*dist[i]-(tenneryBold^.width(tempStr[1])/2)),
             round((screenHeight/2)-cos(degToRad(i*72+252))*dist[i]-(tenneryBold^.height(tempStr[1])/2)), -1);
         end;
       EXIT_ID :
@@ -284,38 +302,53 @@ begin
         end;
       end;
 
-      if ((dist[i] < destDist[i]+compensation*3) and (dist[i] > destDist[i]-compensation*3)) then dist[i] := destDist[i] else
+      if ((dist[i] < destDist[i]+compensation*3) and (dist[i] > destDist[i]-compensation*3))
+         then dist[i] := destDist[i] else
       begin
-        if (dist[i] < destDist[i]) then dist[i] += compensation*3 else if (dist[i] > destDist[i]) then dist[i] -= compensation*3;
+        if (dist[i] < destDist[i]) then dist[i] += compensation*3 else
+           if (dist[i] > destDist[i]) then dist[i] -= compensation*3;
       end;
 
       fontShader^.use;
       fontShader^.setUniform4(EXTRA0_LOCATION, r, g, b, 1.0);
 
-      turretUpgradeSegment^.draw(round((screenWidth/2)+sin(degToRad(i*72+252))*(dist[i]-180)), round((screenHeight/2)-cos(degToRad(i*72+252))*(dist[i]-180)), -1, i*72+162);
+      turretUpgradeSegment^.draw(round((screenWidth/2)+sin(degToRad(i*72+252))*(dist[i]-180)),
+        round((screenHeight/2)-cos(degToRad(i*72+252))*(dist[i]-180)), -1, i*72+162);
+
       fontShader^.use;
       fontShader^.setUniform4(EXTRA0_LOCATION, 1.0, 1.0, 1.0, 1.0);
-      pictosWeb^.write(UPGRADE_CHAR[i], round((screenWidth/2)+sin(degToRad(i*72+252))*(dist[i]-60)-(pictosWeb^.width(UPGRADE_CHAR[i])/2)),
+      pictosWeb^.write(UPGRADE_CHAR[i],
+        round((screenWidth/2)+sin(degToRad(i*72+252))*(dist[i]-60)-(pictosWeb^.width(UPGRADE_CHAR[i])/2)),
         round((screenHeight/2)-cos(degToRad(i*72+252))*(dist[i]-60)-(pictosWeb^.height(UPGRADE_CHAR[i])/2)), -1);
-      turretUpgradeSegmentOverlay^.draw(round((screenWidth/2)+sin(degToRad(i*72+252))*(dist[i]-180)), round((screenHeight/2)-cos(degToRad(i*72+252))*(dist[i]-180)), -1, i*72+162);
+
+      turretUpgradeSegmentOverlay^.draw(round((screenWidth/2)+sin(degToRad(i*72+252))*(dist[i]-180)),
+        round((screenHeight/2)-cos(degToRad(i*72+252))*(dist[i]-180)), -1, i*72+162);
     end;
 
     tempStr := '$';
     case upgradeId of
-    FIRE_UPGRADE_ID : if (turret^.fireLevel < TURRET_MAX_LEVEL) then tempStr += intToStr(FIRE_UPGRADE_PRICE*turret^.fireLevel) else tempStr := 'X';
-    RANGE_UPGRADE_ID : if (turret^.rangeLevel < TURRET_MAX_LEVEL) then tempStr += intToStr(RANGE_UPGRADE_PRICE*turret^.rangeLevel) else tempStr := 'X';
-    HEALTH_UPGRADE_ID : if (turret^.healthLevel < TURRET_MAX_LEVEL) then tempStr += intToStr(HEALTH_UPGRADE_PRICE*turret^.healthLevel) else tempStr := 'X';
-    HEALTH_REPLENISH_ID : if (turret^.getHealth < turret^.getInitialHealth) then tempStr += intToStr(HEALTH_REPLENISH_PRICE) else tempStr := 'X';
+    FIRE_UPGRADE_ID : if (turret^.fireLevel < TURRET_MAX_LEVEL)then
+                    tempStr += intToStr(FIRE_UPGRADE_PRICE*turret^.fireLevel) else tempStr := 'X';
+    RANGE_UPGRADE_ID : if (turret^.rangeLevel < TURRET_MAX_LEVEL) then
+                     tempStr += intToStr(RANGE_UPGRADE_PRICE*turret^.rangeLevel) else tempStr := 'X';
+    HEALTH_UPGRADE_ID : if (turret^.healthLevel < TURRET_MAX_LEVEL) then
+                      tempStr += intToStr(HEALTH_UPGRADE_PRICE*turret^.healthLevel) else tempStr := 'X';
+    HEALTH_REPLENISH_ID : if (turret^.getHealth < turret^.getInitialHealth) then
+                        tempStr += intToStr(HEALTH_REPLENISH_PRICE) else tempStr := 'X';
     EXIT_ID : tempStr := ' ';
     end;
-    tenneryBold^.write(tempStr, round((screenWidth/2)-(tenneryBold^.width(tempStr)/2)), round((screenHeight/2)-(tenneryBold^.height(tempStr)/2)), -1, false);
-    tenneryBold^.write(UPGRADE_TEXT[upgradeId], round((screenWidth/2)-(tenneryBold^.width(UPGRADE_TEXT[upgradeId])/2)), round(screenHeight-(tenneryBold^.height(UPGRADE_TEXT[upgradeId])/2))-40, -1);
+    tenneryBold^.write(tempStr, round((screenWidth/2)-(tenneryBold^.width(tempStr)/2)),
+                                round((screenHeight/2)-(tenneryBold^.height(tempStr)/2)), -1, false);
+    tenneryBold^.write(UPGRADE_TEXT[upgradeId],
+      round((screenWidth/2)-(tenneryBold^.width(UPGRADE_TEXT[upgradeId])/2)),
+      round(screenHeight-(tenneryBold^.height(UPGRADE_TEXT[upgradeId])/2))-40, -1);
 
     drawText;
 
     fontShader^.use;
     fontShader^.setUniform4(EXTRA0_LOCATION, 0.0, 0.0, 0.0, 1.0);
-    tenneryBold^.write('You have $'+intToStr(money), screenWidth-20-tenneryBold^.width('You have $'+intToStr(money)), 20, -1);
+    tenneryBold^.write('You have $'+intToStr(money),
+                            screenWidth-20-tenneryBold^.width('You have $'+intToStr(money)), 20, -1);
     fontShader^.use;
     fontShader^.setUniform4(EXTRA0_LOCATION, 1.0, 1.0, 1.0, 1.0);
 
@@ -329,14 +362,18 @@ begin
   tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);
 
   repeat
-    if ((xDistance < tempXDistance+compensation*2) and (xDistance > tempXDistance-compensation*2)) then xDistance := tempXDistance else
+    if ((xDistance < tempXDistance+compensation*2) and
+       (xDistance > tempXDistance-compensation*2)) then xDistance := tempXDistance else
     begin
-      if (xDistance < tempXDistance) then xDistance += compensation*0.8 else xDistance -= compensation*0.8;
+      if (xDistance < tempXDistance) then xDistance += compensation*0.8
+         else xDistance -= compensation*0.8;
     end;
 
-    if ((zDistance < tempZDistance+compensation*2) and (zDistance > tempZDistance-compensation*2)) then zDistance := tempZDistance else
+    if ((zDistance < tempZDistance+compensation*2) and (zDistance > tempZDistance-compensation*2))
+       then zDistance := tempZDistance else
     begin
-      if (zDistance < tempZDistance) then zDistance += compensation*0.8 else zDistance -= compensation*0.8;
+      if (zDistance < tempZDistance) then zDistance += compensation*0.8
+         else zDistance -= compensation*0.8;
     end;
 
     if (yDistance < 0) then yDistance := 0 else yDistance -= compensation;
@@ -352,7 +389,10 @@ begin
     drawText;
     setup2dMatrices;
     refreshScreen;
-  until ((xDistance = tempXDistance) and (zDistance = tempZDistance) and (yDistance = 0) and (tempRot = 0));
+
+  until ((xDistance = tempXDistance) and (zDistance = tempZDistance) and (yDistance = 0)
+        and (tempRot = 0));
+
   cat^.setModel(catModel);
   cat^.gun^.setVisibility(true);
   cat^.rotate(cat^.xRotation, tempCatRot, cat^.zRotation);
@@ -440,7 +480,9 @@ begin
   shaderToUse^.use;
   if (justDamaged) then shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 0.2, 0.2, 1.0) else
   begin
-    if (hacked) then shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 0.0+(hackAmount/TURRET_HACK_TIME), 1.0, 1.0) else shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0-(hackAmount/TURRET_HACK_TIME), 1.0, 1.0);
+    if (hacked) then shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0,
+       0.0+(hackAmount/TURRET_HACK_TIME), 1.0, 1.0)
+       else shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0-(hackAmount/TURRET_HACK_TIME), 1.0, 1.0);
   end;
 
 
@@ -523,7 +565,8 @@ begin
     end
   else
     begin
-      gameActors.add(new(PFloatText, create('-'+intToStr(TURRET_REWARD)+' pts', x_, y_+20, z_, tenneryBold, 1.0, 0.0, 0.0)));
+      gameActors.add(new(PFloatText, create('-'+intToStr(TURRET_REWARD)+' pts', x_,
+                                     y_+20, z_, tenneryBold, 1.0, 0.0, 0.0)));
       score -= TURRET_REWARD;
       turretKills[FRIENDLY_TURRET] += 1;
     end;
@@ -568,7 +611,9 @@ else
       end
     else
       begin
-        targetDistance := hitScan(x_-(sin(degToRad(-yRotation_))*20), z_+(cos(degToRad(-yRotation_))*20), -yRotation_+180, TURRET_RANGE*rangeLevel, tempTarget);
+        targetDistance := hitScan(x_-(sin(degToRad(-yRotation_))*20),
+          z_+(cos(degToRad(-yRotation_))*20), -yRotation_+180, TURRET_RANGE*rangeLevel, tempTarget);
+
         if (tempTarget <> target) then
         begin
           shooting := false;
@@ -596,27 +641,33 @@ else
   else
     begin
       setFrame(0);
-      if (rotationFlag) then yRotation_ += TURRET_ROTATION_SPEED*compensation else yRotation_ -= TURRET_ROTATION_SPEED*compensation;
+      if (rotationFlag) then yRotation_ += TURRET_ROTATION_SPEED*compensation
+         else yRotation_ -= TURRET_ROTATION_SPEED*compensation;
+
       if (yRotation_ < 0) then yRotation_ += 360 else if (yRotation_ >= 360) then yRotation_ -= 360;
       tempInitialRotation1 := initialRotation;
       tempInitialRotation2 := initialRotation;
       if (initialRotation+45 >= 360) then tempInitialRotation1 -= 360;
       if (initialRotation+315 >= 360) then tempInitialRotation2 -= 360;
-      if ((yRotation_ > tempInitialRotation1+45) and (yRotation_ <= tempInitialRotation1+180)) then rotationFlag := false
-        else if ((yRotation_ < tempInitialRotation2+315) and (yRotation_ > tempInitialRotation2+180)) then rotationFlag := true
+      if ((yRotation_ > tempInitialRotation1+45) and (yRotation_ <= tempInitialRotation1+180))
+        then rotationFlag := false
+        else if ((yRotation_ < tempInitialRotation2+315) and (yRotation_ > tempInitialRotation2+180))
+          then rotationFlag := true
     else
       begin
         if (hacked) then
         begin
           if (cat <> nil) then
           begin
-            hitScan(x_-(sin(degToRad(-yRotation_))*20), z_+(cos(degToRad(-yRotation_))*20), -yRotation_+180, TURRET_RANGE*rangeLevel, target);
+            hitScan(x_-(sin(degToRad(-yRotation_))*20), z_+(cos(degToRad(-yRotation_))*20),
+              -yRotation_+180, TURRET_RANGE*rangeLevel, target);
             if (target = PGameActor(cat)) then shooting := true;
           end;
         end
       else
         begin
-          hitScan(x_-(sin(degToRad(-yRotation_))*20), z_+(cos(degToRad(-yRotation_))*20), -yRotation_+180, TURRET_RANGE*rangeLevel, target, true);
+          hitScan(x_-(sin(degToRad(-yRotation_))*20), z_+(cos(degToRad(-yRotation_))*20),
+            -yRotation_+180, TURRET_RANGE*rangeLevel, target, true);
           if (target <> nil) then shooting := true;
         end;
       end;
@@ -636,7 +687,8 @@ else
   end
 else
   begin
-    if (hacked) then shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 0.0+(hackAmount/TURRET_HACK_TIME), 1.0, 1.0) else shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0-(hackAmount/TURRET_HACK_TIME), 1.0, 1.0);
+    if (hacked) then shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 0.0+(hackAmount/TURRET_HACK_TIME),
+       1.0, 1.0) else shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0-(hackAmount/TURRET_HACK_TIME), 1.0, 1.0);
   end;
 
   if (hackAmount > 0) then hackAmount -= compensation else if (hackAmount < 0) then hackAmount := 0;
@@ -734,7 +786,8 @@ procedure TKittyTurret.shoot;
 var
   xDist, zDist, dist, volume : real;
 begin
-  gameActors.add(new(PBullet1, create(yRotation_, x_-(sin(degToRad(-yRotation_))*20), z_+(cos(degToRad(-yRotation_))*20))));
+  gameActors.add(new(PBullet1, create(yRotation_, x_-(sin(degToRad(-yRotation_))*20),
+    z_+(cos(degToRad(-yRotation_))*20))));
   if (cat <> nil) then
   begin
     xDist := x_-cat^.x;
@@ -764,7 +817,9 @@ end;
 procedure TAkatTurret.update;
 begin
   TTurret.update;
-  if (lastShot < rateOfFire) then drawLine(x_-(sin(degToRad(-yRotation_))*20), 11, z_+(cos(degToRad(-yRotation_))*20), targetDistance, 2, yRotation_-90+((random(3)-1)*0.6), 0.2, 0.2, 0.2, 1.0);
+  if (lastShot < rateOfFire) then drawLine(x_-(sin(degToRad(-yRotation_))*20), 11,
+    z_+(cos(degToRad(-yRotation_))*20), targetDistance, 2, yRotation_-90+((random(3)-1)*0.6),
+    0.2, 0.2, 0.2, 1.0);
 end;
 
 procedure TAkatTurret.shoot;

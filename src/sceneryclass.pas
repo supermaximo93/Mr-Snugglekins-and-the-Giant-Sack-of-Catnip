@@ -80,7 +80,8 @@ var
 begin
   for i := 1 to 5 do
   begin
-    rockModels[i] := new(PModel, create('rock'+intToStr(i), 'assets/models/rocks/', 'rock'+intToStr(i)+'.smo'));
+    rockModels[i] := new(PModel, create('rock'+intToStr(i), 'assets/models/rocks/',
+                  'rock'+intToStr(i)+'.smo'));
   end;
   treeModel := new(PModel, create('tree', 'assets/models/tree/', 'tree.smo'));
   crateModel := new(PModel, create('crate', 'assets/models/crate/', 'crate.smo'));

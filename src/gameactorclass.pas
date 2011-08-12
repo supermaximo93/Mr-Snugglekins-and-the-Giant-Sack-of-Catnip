@@ -146,7 +146,8 @@ procedure TGameActor.drawShadow;
 begin
   if (castsShadow in attributes) then
   begin
-    if (rectangularShadow in attributes) then shadowDot^.draw(x_, 0, z_, yRotation_, width_, height_) else shadowCircle^.draw(x_, 0, z_, yRotation_, width_, width_);
+    if (rectangularShadow in attributes) then shadowDot^.draw(x_, 0, z_, yRotation_,
+      width_, height_) else shadowCircle^.draw(x_, 0, z_, yRotation_, width_, width_);
   end;
 end;
 

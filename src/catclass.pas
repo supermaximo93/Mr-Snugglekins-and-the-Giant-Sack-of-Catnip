@@ -30,19 +30,23 @@ procedure freeCat;
 
 implementation
 
-uses SysUtils, Math, Display, Input, GraphicalAssetClasses, ShaderClass, TextureClass, GlobalGameVariables, SpambotClass, TurretClass, SightClass;
+uses SysUtils, Math, Display, Input, GraphicalAssetClasses, ShaderClass, TextureClass,
+     GlobalGameVariables, SpambotClass, TurretClass, SightClass;
 
 procedure initCat;
 const
   PATH = 'assets/models/cat/';
-  fileNames : array[0..4] of string = (PATH+'ear_map1.jpg', PATH+'face_map2.jpg', PATH+'body_map1.jpg', PATH+'arm_map1.jpg', PATH+'tail_map1.jpg');
+  fileNames : array[0..4] of string = (PATH+'ear_map1.jpg', PATH+'face_map2.jpg',
+            PATH+'body_map1.jpg', PATH+'arm_map1.jpg', PATH+'tail_map1.jpg');
 var
   i : integer;
 begin
   catModel := new(PModel, create('cat', 'assets/models/cat/', 'cat.smo'));
-  catWithSpannerModel := new(PModel, create('catWithSpanner', 'assets/models/catspanner/', 'catspanner.smo'));
+  catWithSpannerModel := new(PModel, create('catWithSpanner', 'assets/models/catspanner/',
+                      'catspanner.smo'));
 
-  for i := 0 to 6 do lightningSprite[i] := new(PSprite, create('lightning'+intToStr(i), 'assets/sprites/lightning/'+intToStr(i)+'.png', 0, 0, 300, 30, 1, 1, 0, 15));
+  for i := 0 to 6 do lightningSprite[i] := new(PSprite, create('lightning'+intToStr(i),
+      'assets/sprites/lightning/'+intToStr(i)+'.png', 0, 0, 300, 30, 1, 1, 0, 15));
   euphoriaTexture := new(PTexture, create('euphoriaTexture', TEXTURE_3D, fileNames));
 end;
 
@@ -204,7 +208,8 @@ begin
     exit;
   end;
 
-  if (up or down or left or right {$ifndef NO_BUTTON_LIMIT}or clockwise or anticlockwise{$endif} or pushed) then setFrame(CAT_ANIMATION_SPEED, true) else setFrame(15);
+  if (up or down or left or right {$ifndef NO_BUTTON_LIMIT}or clockwise or anticlockwise{$endif}
+     or pushed) then setFrame(CAT_ANIMATION_SPEED, true) else setFrame(15);
 
   pushed := false;
   rotate(0, -rotation+180, 0);
@@ -233,9 +238,14 @@ begin
       if (trigger) then
       begin
         tempTurret^.hack;
-        if (time < 25) then elipsisStr := '' else if (time < 50) then elipsisStr += '.' else if (time < 75) then elipsisStr += '..' else elipsisStr += '...';
-        bufferText(TURRET_HACKING_TEXT+elipsisStr, tempTurret^.x, 30, tempTurret^.z, turretHackingTextWidthOverTwo, 0.1, 1.0, 1.0, 1.0, 1.0, tenneryBold);
-      end else bufferText(TURRET_HACK_TEXT, tempTurret^.x, 30, tempTurret^.z, turretHackTextWidthOverTwo, 0.1, 1.0, 1.0, 1.0, 1.0, tenneryBold);
+        if (time < 25) then elipsisStr := '' else if (time < 50)
+           then elipsisStr += '.' else if (time < 75) then elipsisStr += '..' else elipsisStr += '...';
+
+        bufferText(TURRET_HACKING_TEXT+elipsisStr, tempTurret^.x, 30, tempTurret^.z,
+          turretHackingTextWidthOverTwo, 0.1, 1.0, 1.0, 1.0, 1.0, tenneryBold);
+
+      end else bufferText(TURRET_HACK_TEXT, tempTurret^.x, 30, tempTurret^.z,
+          turretHackTextWidthOverTwo, 0.1, 1.0, 1.0, 1.0, 1.0, tenneryBold);
     end
   else
     begin
@@ -245,25 +255,40 @@ begin
       end
     else
       begin
-        if ((tempTurret^.getFireLevel < TURRET_MAX_LEVEL) or (tempTurret^.getRangeLevel < TURRET_MAX_LEVEL) or (tempTurret^.getHealthLevel < TURRET_MAX_LEVEL)) then
-           bufferText(TURRET_UPGRADE_TEXT, tempTurret^.x, 35, tempTurret^.z, turretUpgradeTextWidthOverTwo, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold)
+        if ((tempTurret^.getFireLevel < TURRET_MAX_LEVEL) or
+           (tempTurret^.getRangeLevel < TURRET_MAX_LEVEL) or
+           (tempTurret^.getHealthLevel < TURRET_MAX_LEVEL)) then
+           bufferText(TURRET_UPGRADE_TEXT, tempTurret^.x, 35, tempTurret^.z,
+           turretUpgradeTextWidthOverTwo, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold)
+
         else if (tempTurret^.getHealth < tempTurret^.getInitialHealth) then
-           bufferText(TURRET_HEAL_TEXT, tempTurret^.x, 35, tempTurret^.z, turretHealTextWidthOverTwo, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
+           bufferText(TURRET_HEAL_TEXT, tempTurret^.x, 35, tempTurret^.z,
+           turretHealTextWidthOverTwo, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
 
-        bufferText('l', tempTurret^.x+cos(degToRad(rotation))*13, 28, tempTurret^.z+sin(degToRad(rotation))*13, 5, 0.1, 1.0, 1.0, 0.2, 1.0, pictosWeb);
-        bufferText(intToStr(tempTurret^.getFireLevel), tempTurret^.x+cos(degToRad(rotation))*19, 28, tempTurret^.z+sin(degToRad(rotation))*19, 5, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
+        bufferText('l', tempTurret^.x+cos(degToRad(rotation))*13, 28,
+          tempTurret^.z+sin(degToRad(rotation))*13, 5, 0.1, 1.0, 1.0, 0.2, 1.0, pictosWeb);
 
-        bufferText('''', tempTurret^.x+cos(degToRad(rotation))*3, 28, tempTurret^.z+sin(degToRad(rotation))*3, 5, 0.1, 0.0, 0.0, 1.0, 1.0, pictosWeb);
-        bufferText(intToStr(tempTurret^.getRangeLevel), tempTurret^.x+cos(degToRad(rotation))*9, 28, tempTurret^.z+sin(degToRad(rotation))*9, 5, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
+        bufferText(intToStr(tempTurret^.getFireLevel), tempTurret^.x+cos(degToRad(rotation))*19,
+          28, tempTurret^.z+sin(degToRad(rotation))*19, 5, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
 
-        bufferText('k', tempTurret^.x-cos(degToRad(rotation))*13, 28, tempTurret^.z-sin(degToRad(rotation))*13, 5, 0.1, 1.0, 0.0, 0.0, 1.0, pictosWeb);
-        bufferText(intToStr(round(tempTurret^.getHealth)), tempTurret^.x-cos(degToRad(rotation))*8, 28, tempTurret^.z-sin(degToRad(rotation))*8, 5, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
+        bufferText('''', tempTurret^.x+cos(degToRad(rotation))*3, 28,
+          tempTurret^.z+sin(degToRad(rotation))*3, 5, 0.1, 0.0, 0.0, 1.0, 1.0, pictosWeb);
+
+        bufferText(intToStr(tempTurret^.getRangeLevel), tempTurret^.x+cos(degToRad(rotation))*9,
+          28, tempTurret^.z+sin(degToRad(rotation))*9, 5, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
+
+        bufferText('k', tempTurret^.x-cos(degToRad(rotation))*13, 28,
+          tempTurret^.z-sin(degToRad(rotation))*13, 5, 0.1, 1.0, 0.0, 0.0, 1.0, pictosWeb);
+
+        bufferText(intToStr(round(tempTurret^.getHealth)), tempTurret^.x-cos(degToRad(rotation))*8,
+          28, tempTurret^.z-sin(degToRad(rotation))*8, 5, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
       end;
     end;
   end else if (trigger) then gun^.shootFlag := true;
 
   tintShader^.use;
-  if (euphoriaBonus > 1) then tintShader^.setUniform4(EXTRA1_LOCATION, 2.0, 2.0, 1.0, 1.0) else tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);
+  if (euphoriaBonus > 1) then tintShader^.setUniform4(EXTRA1_LOCATION, 2.0, 2.0, 1.0, 1.0)
+     else tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);
 
   draw(false, true);
   tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);

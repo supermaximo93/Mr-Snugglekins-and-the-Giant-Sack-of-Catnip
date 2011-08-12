@@ -158,7 +158,9 @@ begin
         begin
           cat^.gun^.dieFlag := true;
           cat^.setGun(@self);
-          setPosition(-xDistance+sin(degToRad(yRotation_))*6, 11, -zDistance+(cos(degToRad(yRotation_))*6));
+          setPosition(-xDistance+sin(degToRad(yRotation_))*6, 11,
+            -zDistance+(cos(degToRad(yRotation_))*6));
+
           yRotation_ := -rotation+180;
           bipSound^.play(round(50*soundEffectsVolume));
           exit;
@@ -262,7 +264,8 @@ begin
   TGun.update;
   if (visible_) then
   begin
-    if (lastShot < rateOfFire) then drawLine(x_, 13, z_, bulletLength, 2, -bulletRot+90, 0.2, 0.2, 0.2, 1.0);
+    if (lastShot < rateOfFire) then
+      drawLine(x_, 13, z_, bulletLength, 2, -bulletRot+90, 0.2, 0.2, 0.2, 1.0);
     draw(true, true);
     finalUpdate;
   end;

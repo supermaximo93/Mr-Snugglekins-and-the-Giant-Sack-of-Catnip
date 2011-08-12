@@ -35,7 +35,8 @@ procedure freeShopkeeper;
 
 implementation
 
-uses Display, GraphicalAssetClasses, TextureClass, ShaderClass, SoundClass, GlobalGameVariables;
+uses Display, GraphicalAssetClasses, TextureClass, ShaderClass, SoundClass,
+     GlobalGameVariables;
 
 const
   MOUTH_OPEN_TIME = 10;
@@ -53,7 +54,8 @@ var
 procedure initShopkeeper;
 const
   PATH = 'assets/models/shopkeeper/';
-  fileNames : array[0..4] of string = (PATH+'ear_map1.jpg', PATH+'face_map2.jpg', PATH+'body_map1.jpg', PATH+'arm_map1.jpg', 'Filler for compatibility with GLSL versions < 1.3');
+  fileNames : array[0..4] of string = (PATH+'ear_map1.jpg', PATH+'face_map2.jpg',
+            PATH+'body_map1.jpg', PATH+'arm_map1.jpg', 'Filler for compatibility with GLSL versions < 1.3');
 begin
   shopkeeperModel := new(PModel, create('cat', 'assets/models/shopkeeper/', 'shopkeeper.smo'));
   tableModel := new(PModel, create('table', 'assets/models/table/', 'table.smo'));
@@ -61,12 +63,23 @@ begin
   hatModel := new(PModel, create('dunceHat', 'assets/models/duncehat/', 'duncehat.smo'));
   mouthOpenTexture := new(PTexture, create('mouthOpenTexture', TEXTURE_3D, fileNames));
 
-  welcomeSound := new(PSound, create('shopkeeperHelloWelcomeToMyShop', 'assets/sounds/shopkeeper_hello_welcome_to_my_shop.ogg'));
-  goodbyeSound := new(PSound, create('shopkeeperHaveANiceDay', 'assets/sounds/shopkeeper_have_a_nice_day.ogg'));
-  purchaseSound[0] := new(PSound, create('shopkeeperHelloWelcomeToMyShop', 'assets/sounds/shopkeeper_ah_great_choice_that_really_packs_a_punch.ogg'));
-  purchaseSound[1] := new(PSound, create('shopkeeperHelloWelcomeToMyShop', 'assets/sounds/shopkeeper_nice_one_nice_one.ogg'));
-  purchaseSound[2] := new(PSound, create('shopkeeperHelloWelcomeToMyShop', 'assets/sounds/shopkeeper_woah_be_careful_with_that.ogg'));
-  cashRegisterSound := new(PSound, create('shopkeeperHelloWelcomeToMyShop', 'assets/sounds/cash-register-05.ogg'));
+  welcomeSound := new(PSound, create('shopkeeperHelloWelcomeToMyShop',
+               'assets/sounds/shopkeeper_hello_welcome_to_my_shop.ogg'));
+
+  goodbyeSound := new(PSound, create('shopkeeperHaveANiceDay',
+               'assets/sounds/shopkeeper_have_a_nice_day.ogg'));
+
+  purchaseSound[0] := new(PSound, create('shopkeeperHelloWelcomeToMyShop',
+                   'assets/sounds/shopkeeper_ah_great_choice_that_really_packs_a_punch.ogg'));
+
+  purchaseSound[1] := new(PSound, create('shopkeeperHelloWelcomeToMyShop',
+                   'assets/sounds/shopkeeper_nice_one_nice_one.ogg'));
+
+  purchaseSound[2] := new(PSound, create('shopkeeperHelloWelcomeToMyShop',
+                   'assets/sounds/shopkeeper_woah_be_careful_with_that.ogg'));
+
+  cashRegisterSound := new(PSound, create('shopkeeperHelloWelcomeToMyShop',
+                    'assets/sounds/cash-register-05.ogg'));
 end;
 
 procedure freeShopkeeper;

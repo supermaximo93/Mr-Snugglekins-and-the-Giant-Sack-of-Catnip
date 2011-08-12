@@ -50,14 +50,16 @@ procedure freeSpawnPoints;
 
 implementation
 
-uses Display, ShaderClass, GraphicalAssetClasses, CatClass, SpambotClass, GlobalGameVariables;
+uses Display, ShaderClass, GraphicalAssetClasses, CatClass, SpambotClass,
+     GlobalGameVariables;
 
 var
   spawnPointModel : PModel;
 
 procedure initSpawnPoints;
 begin
-  spawnPointModel := new(PModel, create('spawnPoint', 'assets/models/spawnpoint/', 'spawnpoint.smo'));
+  spawnPointModel := new(PModel, create('spawnPoint', 'assets/models/spawnpoint/',
+                  'spawnpoint.smo'));
 end;
 
 procedure freeSpawnPoints;

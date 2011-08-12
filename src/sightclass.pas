@@ -41,7 +41,8 @@ begin
   x_ := -xDistance;
   z_ := -zDistance;
   xScale_ := hitScan(x_, z_, rotation, RAY_MAX_LENGTH, tempGameActor, false, true);
-  if (tempGameActor <> nil) then drawLine(x_, y_, z_, xScale_, 1, yRotation_, 1.0, 0.0, 0.0, 1.0) else drawLine(x_, y_, z_, xScale_, 1, yRotation_, 1.0, 1.0, 1.0, 1.0);
+  if (tempGameActor <> nil) then drawLine(x_, y_, z_, xScale_, 1, yRotation_, 1.0, 0.0, 0.0, 1.0)
+     else drawLine(x_, y_, z_, xScale_, 1, yRotation_, 1.0, 1.0, 1.0, 1.0);
 end;
 
 end.
