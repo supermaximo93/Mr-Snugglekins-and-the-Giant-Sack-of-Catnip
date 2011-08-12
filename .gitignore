@@ -16,3 +16,4 @@ src/assets/dglOpenGL.pas
 *.sh
 *.rc
 *.manifest
+src/main
