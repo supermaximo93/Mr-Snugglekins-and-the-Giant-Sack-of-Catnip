@@ -7,6 +7,7 @@ interface
 uses GameActorClass;
 
 type
+  //The pickup class is for objects that can be picked up by the player that aren't guns
   PPickup = ^TPickup;
   TPickup = object(TGameActor)
   public
@@ -16,6 +17,7 @@ type
     procedure pickup; virtual; abstract;
   end;
 
+  //A healthpack replenishes some of the player's health
   PHealthPack = ^THealthPack;
   THealthPack = object(TPickup)
   public
@@ -23,6 +25,7 @@ type
     procedure pickup; virtual;
   end;
 
+  //A Euphoria pack boosts the player's Euphoria meter
   PEuphoriaPack = ^TEuphoriaPack;
   TEuphoriaPack = object(TPickup)
   public
@@ -30,6 +33,7 @@ type
     procedure pickup; virtual;
   end;
 
+//Load and free the healthpack and euphoriapack models
 procedure initPickups;
 procedure freePickups;
 

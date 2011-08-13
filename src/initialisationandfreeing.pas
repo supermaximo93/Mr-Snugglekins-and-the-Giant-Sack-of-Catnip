@@ -119,18 +119,21 @@ else
     writeln('Compiling GLSL version 1.1 shaders');
   end;
 
+  //A shader to display 2D images that don't need any colour tinting
   spriteShader := addShader('spriteShader', 'assets/shaders/'+glSlPath+'sprite_vertex_shader.vs',
                'assets/shaders/'+glSlPath+'sprite_fragment_shader.fs', spriteEnums, spriteAttrs);
   spriteShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
   spriteShader^.setUniformLocation(PROJECTION_LOCATION, 'projectionMatrix');
   spriteShader^.setUniformLocation(TEXSAMPLER_LOCATION, 'colorMap');
 
+  //A shader to draw the shadows nicely on the ground
   shadowShader := addShader('shadowShader', 'assets/shaders/'+glSlPath+'sprite_vertex_shader.vs',
                'assets/shaders/'+glSlPath+'shadow_fragment_shader.fs', spriteEnums, spriteAttrs);
   shadowShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
   shadowShader^.setUniformLocation(PROJECTION_LOCATION, 'projectionMatrix');
   shadowShader^.setUniformLocation(TEXSAMPLER_LOCATION, 'colorMap');
 
+  //A shader to draw models that don't need tinting but do need lighting
   modelShader := addShader('modelShader', 'assets/shaders/'+glSlPath+'skeleton_vertex_shader.vs',
               'assets/shaders/'+glSlPath+'skeleton_fragment_shader.fs', modelEnums, modelAttrs);
   modelShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
@@ -139,18 +142,21 @@ else
   modelShader^.setUniformLocation(EXTRA0_LOCATION, 'jointModelviewMatrix');
   if (glSlVersion < 1.5) then modelShader^.setUniformLocation(TEXCOMPAT_LOCATION, 'materialCount');
 
+  //A shader to draw models with no lighting effects or shading
   flatShader := addShader('flatShader', 'assets/shaders/'+glSlPath+'model_vertex_shader.vs',
              'assets/shaders/'+glSlPath+'model_fragment_shader.fs', modelEnums, modelAttrs);
   flatShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
   flatShader^.setUniformLocation(PROJECTION_LOCATION, 'projectionMatrix');
   flatShader^.setUniformLocation(TEXSAMPLER_LOCATION, 'colorMap');
 
+  //A shader to draw lines in 3D space
   lineShader := addShader('lineShader', 'assets/shaders/'+glSlPath+'line_vertex_shader.vs',
              'assets/shaders/'+glSlPath+'line_fragment_shader.fs', spriteEnums, spriteAttrs);
   lineShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
   lineShader^.setUniformLocation(PROJECTION_LOCATION, 'projectionMatrix');
   lineShader^.setUniformLocation(TEXSAMPLER_LOCATION, 'color');
 
+  //A shader to draw lines around a 3D model for a cartoon effect
   skeletonLineShader := addShader('skeletonLineShader', 'assets/shaders/'+glSlPath+'skeleton_line_vertex_shader.vs',
                      'assets/shaders/'+glSlPath+'line_fragment_shader.fs', spriteEnums, spriteAttrs);
   skeletonLineShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
@@ -158,6 +164,7 @@ else
   skeletonLineShader^.setUniformLocation(TEXSAMPLER_LOCATION, 'color');
   skeletonLineShader^.setUniformLocation(EXTRA0_LOCATION, 'jointModelviewMatrix');
 
+  //A shader for drawing fonts with a colour tint. This shader is also useful for drawing regular tinted sprites.
   fontShader := addShader('fontShader', 'assets/shaders/'+glSlPath+'sprite_vertex_shader.vs',
              'assets/shaders/'+glSlPath+'font_fragment_shader.fs', spriteEnums, spriteAttrs);
   fontShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
@@ -165,6 +172,7 @@ else
   fontShader^.setUniformLocation(TEXSAMPLER_LOCATION, 'colorMap');
   fontShader^.setUniformLocation(EXTRA0_LOCATION, 'color');
 
+  //A shader for drawing a 3D model, with lighting effects and colour tinting
   tintShader := addShader('tintShader', 'assets/shaders/'+glSlPath+'skeleton_vertex_shader.vs',
              'assets/shaders/'+glSlPath+'tint_fragment_shader.fs', modelEnums, modelAttrs);
   tintShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
@@ -174,6 +182,8 @@ else
   tintShader^.setUniformLocation(EXTRA1_LOCATION, 'tint');
   if (glSlVersion < 1.5) then tintShader^.setUniformLocation(TEXCOMPAT_LOCATION, 'materialCount');
 
+  //A shader for drawing a 3D model with a dissolve effect that disintegrates the model over time, using
+  //the 'percentage' uniform to specify the amount of disintegration
   dissolveShader := addShader('dissolveShader', 'assets/shaders/'+glSlPath+'skeleton_vertex_shader.vs',
                  'assets/shaders/'+glSlPath+'dissolve_fragment_shader.fs', modelEnums, modelAttrs);
   dissolveShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
@@ -184,6 +194,7 @@ else
   dissolveShader^.setUniformLocation(EXTRA2_LOCATION, 'dissolveMap');
   if (glSlVersion < 1.5) then dissolveShader^.setUniformLocation(TEXCOMPAT_LOCATION, 'materialCount');
 
+  //A shader that chops off a portion of a sprite according the value of cutoff, acting vertically
   drainVerticalShader := addShader('drainVerticalShader', 'assets/shaders/'+glSlPath+'sprite_vertex_shader.vs',
                       'assets/shaders/'+glSlPath+'drain_vertical_fragment_shader.fs', spriteEnums, spriteAttrs);
   drainVerticalShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
@@ -192,6 +203,7 @@ else
   drainVerticalShader^.setUniformLocation(EXTRA0_LOCATION, 'color');
   drainVerticalShader^.setUniformLocation(EXTRA1_LOCATION, 'cutoff');
 
+  //A shader that chops off a portion of a sprite according the value of cutoff, acting horizontally
   drainHorizontalShader := addShader('drainHorizontalShader', 'assets/shaders/'+glSlPath+'sprite_vertex_shader.vs',
                         'assets/shaders/'+glSlPath+'drain_horizontal_fragment_shader.fs', spriteEnums, spriteAttrs);
   drainHorizontalShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
@@ -200,6 +212,8 @@ else
   drainHorizontalShader^.setUniformLocation(EXTRA0_LOCATION, 'color');
   drainHorizontalShader^.setUniformLocation(EXTRA1_LOCATION, 'cutoff');
 
+  //A shader for drawing a 3D model with lighting and a colour tint, while using another texture to generate
+  //a worn look, or if the 'severeWear' uniform equals 1, to create holes in the model to give a truly battered look
   tintAndWearShader := addShader('tintAndWearShader', 'assets/shaders/'+glSlPath+'skeleton_vertex_shader.vs',
                     'assets/shaders/'+glSlPath+'tint_and_wear_fragment_shader.fs', modelEnums, modelAttrs);
   tintAndWearShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
@@ -211,6 +225,9 @@ else
   tintAndWearShader^.setUniformLocation(EXTRA3_LOCATION, 'severeWear');
   if (glSlVersion < 1.5) then tintAndWearShader^.setUniformLocation(TEXCOMPAT_LOCATION, 'materialCount');
 
+  //A shader for drawing a 3D model with lighting and a colour tint that allows switching between two different
+  //textures. This shader is used in the shop to make it look like the shopkeeper is talking by switching two
+  //different face textures
   alternateTextureShader := addShader('alternateTextureShader', 'assets/shaders/'+glSlPath+'skeleton_vertex_shader.vs',
                          'assets/shaders/'+glSlPath+'alternate_texture_fragment_shader.fs', modelEnums, modelAttrs);
   alternateTextureShader^.setUniformLocation(MODELVIEW_LOCATION, 'modelviewMatrix');
@@ -222,6 +239,7 @@ else
   alternateTextureShader^.setUniformLocation(EXTRA3_LOCATION, 'tint');
   if (glSlVersion < 1.5) then alternateTextureShader^.setUniformLocation(TEXCOMPAT_LOCATION, 'materialCount');
 
+  //Load up the texture for the dissolve and tintAndWear shaders
   dissolveMap := new(PTexture, create('dissolveMap', TEXTURE_2D, fileNames));
 end;
 

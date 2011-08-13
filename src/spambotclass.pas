@@ -23,7 +23,14 @@ type
   protected
     moving, attacking : boolean;
     timeFromDamage, damage, rotationAmount : real;
+
+    //reward is the amount of money you get per spambot destroyed, standingFrame is
+    //the frame where it looks like the spambot is standing still, and avoidRotation
+    //can be either 1 or -1 and determines which direction the spambot will take
+    //when trying to navigate around an obstacle
     reward, standingFrame, avoidRotation : integer;
+    //obstacle is the object that the spambot is trying to navigate around, and target
+    //is the object that the spambot is trying to get to
     obstacle, target : PGameActor;
     spambotType : spambotTypeEnum;
   public
@@ -39,9 +46,12 @@ type
 
     function getTarget : PGameActor;
     procedure setTarget(newTarget : PGameActor);
-    function rotationToTarget : real;
-    function distanceToTargetSquared : real;
+    function rotationToTarget : real; //Amount needed to rotate to face the target
+    function distanceToTargetSquared : real; //Because square roots are slow!
 
+    //Make it so that the spambot is reset and is as if it had just spawned. Used
+    //when a hacker has just hacked a turret or when a new turret is built so that
+    //they can move to attack new turrets
     procedure resetAttack;
   end;
 
@@ -57,6 +67,7 @@ type
   public
     constructor create(destX, destZ : real);
     procedure update; virtual;
+    //When a turret is hacked/destroyed/built, choose a new turret to hack (if any)
     procedure updateHackTarget;
   end;
 
@@ -67,6 +78,7 @@ type
     procedure update; virtual;
   end;
 
+//Load up and free the spambot models
 procedure initSpambots;
 procedure freeSpambots;
 
@@ -77,7 +89,7 @@ uses SysUtils, Classes, Math, Display, Input, GraphicalAssetClasses, ShaderClass
 
 var
   droneModel, hackerModel, mechModel : PModel;
-  sparkSprite : array[0..2] of PSprite;
+  sparkSprite : array[0..2] of PSprite; //Used for a graphical effect when hackers attack
 
 procedure initSpambots;
 var
@@ -108,11 +120,14 @@ var
   tempSpambot : PSpambot;
   tempTurret : PTurret;
 begin
+  //remove it from the necessary lists
   collidables.delete(collidables.indexOf(@self));
   spambots.delete(spambots.indexOf(@self));
 
   if (not quit) then
   begin
+    //If a spambot is trying to get around this one, tell it to not worry as this
+    //one has just been destroyed anyway
     if (spambots.count > 0) then
     begin
       for i := 0 to spambots.count-1 do
@@ -121,6 +136,8 @@ begin
         if (tempSpambot^.obstacle = @self) then tempSpambot^.obstacle := nil;
       end;
     end;
+
+    //Tell any turrets that are attacking this spambot to stop attacking
     if (turrets.count > 0) then
     begin
       for i := 0 to turrets.count-1 do
@@ -130,6 +147,7 @@ begin
       end;
     end;
 
+    //increment the spambot kills and maybe drop something for the player to pick up
     spambotKills[spambotType] += 1;
     randomDrop(x_, z_);
   end;
@@ -163,23 +181,27 @@ var
 begin
   if (visible_) then
   begin
-    if (health < initialHealth/3) then
+    if (health < initialHealth/3) then //The spambot is badly damaged, so...
     begin
-      shaderToUse := tintAndWearShader;
+      shaderToUse := tintAndWearShader;   //Set up necessary shader uniforms
       tintAndWearShader^.use;
       tintAndWearShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);
       tintAndWearShader^.setUniform1(EXTRA2_LOCATION, 1);
+
+      //Yes, we want to see some major scars in this spambot
       tintAndWearShader^.setUniform1(EXTRA3_LOCATION, 1);
       bindDissolveMap;
-    end else if (health < (initialHealth/3)*2) then
+    end else if (health < (initialHealth/3)*2) then //The spambot is a bit damaged, so...
     begin
       shaderToUse := tintAndWearShader;
       tintAndWearShader^.use;
       tintAndWearShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);
       tintAndWearShader^.setUniform1(EXTRA2_LOCATION, 1);
+
+      //We just want the spambot to look a bit beat up, not completely trashed
       tintAndWearShader^.setUniform1(EXTRA3_LOCATION, 0);
       bindDissolveMap;
-    end else shaderToUse := tintShader;
+    end else shaderToUse := tintShader; //No battle scars so bind the regular tint shader
   end else shaderToUse := tintShader;
 
   shaderToUse^.bind;
@@ -187,6 +209,9 @@ begin
 
   if (justDamaged) then
   begin
+    //If the timeFromDamage timer hasn't passed the time period for making the
+    //spambot appear red, then tell our shader to tint the spambot red, and
+    //increment the timer
     if (timeFromDamage > DAMAGE_TINT_TIME) then
     begin
       justDamaged := false;
@@ -197,6 +222,7 @@ begin
 
   if (moving) then
   begin
+    //Just in case we can't actually move, store the current coordinates before changing
     tempX := x_;
     tempZ := z_;
     x_ += sin(degToRad(yRotation_))*speed*compensation;
@@ -216,6 +242,7 @@ begin
               collided := true;
               if (tempGameActor <> obstacle) then
               begin
+                //The amount to rotate around the obstacle by
                 rotationAmount := 110*(abs(radToDeg(arcTan(speed/tempGameActor^.getRadius)))/360);
                 if (tempGameActor^.name[1] = ENEMY_CHARACTER) then
                 begin
@@ -248,8 +275,10 @@ begin
 
     if (collided) then
     begin
-      x_ := tempX;
+      x_ := tempX; //If we ended up colliding with something go back to previous coordinates
       z_ := tempZ;
+
+      //If we're trying to get to the sack and are in range, then attack it
       if (target = PGameActor(sack)) then
       begin
         if ((distanceToTargetSquared <= MAXIMUM_SACK_DISTANCE_FOR_ATTACK_SQUARED) or
@@ -271,16 +300,22 @@ begin
           setCurrentAnimation(1);
         end;
       end;
+      //If there's something in our way, try to avoid it
       if (obstacle <> nil) then yRotation_ += avoidRotation*compensation;
     end
   else
     begin
-      angle := rotationToTarget;
+      angle := rotationToTarget; //Get the angle we need to rotate by to face the target
       if (yRotation_ <> angle) then
       begin
         yRotation_ -= avoidRotation*rotationAmount*compensation;
         tempYRotation := yRotation_;
         tempAngle := angle;
+
+        //If we're close enough then jump straight to facing the target (while compensating
+        //just in case we get to the 360/0 degree boundary (i.e. 361 degrees is converted
+        //to 1 degree, which can cause problems, as the computer doesn't understand that
+        //in this situation 1 degree is in fact greater than 360 degrees)
         if (angle+10 > 360) then
         begin
           tempAngle -= (angle+10)-360;
@@ -299,7 +334,7 @@ begin
     end;
 
     if (yRotation_ > 360) then yRotation_ -= 360 else if (yRotation_ < 0) then yRotation_ += 360;
-    setFrame(1.5, true);
+    setFrame(1.5, true); //Animate
   end
 else
   begin
@@ -307,10 +342,10 @@ else
     begin
       setFrame(1.5, true);
       if (target = PGameActor(sack)) then sack^.doDamage(damage*compensation);
-    end else setFrame(standingFrame);
+    end else setFrame(standingFrame); //If we're not moving and not attacking then just stand still
   end;
 
-  if (visible_) then
+  if (visible_) then //If the spambot can be seen then draw it
   begin
     draw(false, true);
     tintShader^.bind;
@@ -324,6 +359,7 @@ procedure TSpambot.pausedDraw;
 var
   shaderToUse : PShader;
 begin
+  //Same shader and drawing code used in the update method
   if (health < initialHealth/3) then
   begin
     shaderToUse := tintAndWearShader;
@@ -459,12 +495,14 @@ procedure THacker.update;
 begin
   TSpambot.update;
 
+  //If attacking then draw some sparks
   if (attacking) then
     bufferSprite(sparkSprite[random(3)], x_+sin(degToRad(yRotation_))*10+sin(degToRad(yRotation_-90))*4,
       y_-1.5, z_+cos(degToRad(yRotation_))*10+cos(degToRad(yRotation_-90))*4, 0.2, 1.0, 1.0, 1.0, 1.0);
 
   if (target <> nil) then
   begin
+    //If we're attacking a turret, hack it instead of hurting it
     if (attacking and (target^.name[1] = TURRET_CHARACTER)) then PTurret(target)^.hack;
   end;
 
@@ -482,7 +520,7 @@ var
   distanceSquared, tempDist : longword;
   tempTurret : PGameActor = nil;
 begin
-  distanceSquared := 4294967290;
+  distanceSquared := 4294967290; //Some random big number
   if (target = PGameActor(sack)) then
   begin
     if (turrets.count > 0) then
@@ -490,6 +528,7 @@ begin
       for i := 0 to turrets.count-1 do
       begin
         target := PGameActor(turrets[i]);
+        //We aren't interested in already hacked turrets
         if (PTurret(target)^.isHacked) then continue;
         tempDist := round(distanceToTargetSquared);
         if (tempDist < distanceSquared) then
@@ -500,6 +539,7 @@ begin
       end;
     end;
   end;
+  //If there aren't any turrets to hack then attack the sack
   if (tempTurret <> nil) then target := tempTurret else target := sack;
 end;
 
