@@ -7,10 +7,12 @@ interface
 uses GameActorClass;
 
 const
+  //The directions of each particle in the explosion
   VECTORS : array[0..13] of array[0..2] of integer =
     ((-1, 1, 1), (-1, 1, -1), (-1, -1, -1), (-1, -1, 1), (1, 1, 1), (1, 1, -1),
     (1, -1, -1), (1, -1, 1), (-1, 0, 0), (1, 0, 0), (0, -1, 0), (0, 1, 0), (0, 0, -1),
     (0, 0, 1));
+  //Avoiding unnecessary calculation
   VECTOR_LENGTH_TAKE_ONE = 13;
   VECTOR_LENGTH_TIMES_THREE_TAKE_ONE = 41;
 
@@ -66,6 +68,9 @@ begin
         x := x_;
         y := y_;
         z := z_;
+        //Set the speed in each axis for each particle from the direction vectors.
+        //For large explosions, each particle needs to travel quicker. The smaller the
+        //particle in an explosion, the quicker it moves
         xSpeed := VECTORS[i][0]*j*newSize;
         ySpeed := VECTORS[i][1]*j*newSize;
         zSpeed := VECTORS[i][2]*j*newSize;
@@ -75,6 +80,7 @@ begin
     end;
   end;
 
+  //Play a sound if we can hear it
   if (cat <> nil) then
   begin
     xDist := x_-cat^.x;
@@ -101,6 +107,7 @@ begin
   time += compensation;
   if (time > 40) then dieFlag := true;
 
+  //Move the particles and draw them
   for i := 0 to VECTOR_LENGTH_TIMES_THREE_TAKE_ONE do
   begin
     particles[i].x += compensation*particles[i].xSpeed;
@@ -119,6 +126,7 @@ procedure TExplosion.pausedDraw;
 var
   i : integer;
 begin
+  //Just draw the particles without updating them
   for i := 0 to VECTOR_LENGTH_TIMES_THREE_TAKE_ONE do bufferSprite(smoke, particles[i].x,
       particles[i].y, particles[i].z, particles[i].size/5, 1.0, 1.0, 1.0, 1.0);
 end;

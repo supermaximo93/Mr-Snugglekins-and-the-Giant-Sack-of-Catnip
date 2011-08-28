@@ -28,6 +28,7 @@ type
     function isReloaded : boolean;
   end;
 
+  //Generic gun
   PKittyGun = ^TKittyGun;
   TKittyGun = object(TGun)
   public
@@ -36,6 +37,7 @@ type
     procedure shoot; virtual;
   end;
 
+  //Hit scan gun
   PAkat = ^TAkat;
   TAkat = object(TGun)
   private
@@ -46,6 +48,7 @@ type
     procedure shoot; virtual;
   end;
 
+  //Shotgun
   PBirdCatcher = ^TBirdCatcher;
   TBirdCatcher = object(TGun)
   public
@@ -54,6 +57,7 @@ type
     procedure shoot; virtual;
   end;
 
+  //Bazooka
   PAntiMech = ^TAntiMech;
   TAntiMech = object(TGun)
   public
@@ -122,18 +126,23 @@ begin
   begin
     if (cat^.gun = @self) then
     begin
+      //rotate the gun to the player's orientation
       yRotation_ := -rotation+180;
       x_ := -xDistance+(sin(degToRad(yRotation_))*height_);
       y_ := 11;
       z_ := -zDistance+(cos(degToRad(yRotation_))*height_);
+
+      //Try to shoot
       if (shootFlag) then
       begin
         shootFlag := false;
+        //Fire if there's still bullets available
         if ((lastShot >= rateOfFire) and reloaded) then
         begin
           lastShot := 0.0;
           shoot;
           clip -= 1;
+          //If we ran out of bullets, reload
           if (clip <= 0) then
           begin
             lastEmpty := 0.0;
@@ -142,6 +151,7 @@ begin
           end;
         end;
       end;
+      //Shoot and reload faster if the player has Euphoria
       if (lastShot < rateOfFire) then lastShot += compensation*euphoriaBonus;
       if (lastEmpty < reloadTime) then lastEmpty += compensation*euphoriaBonus
     else if (not reloaded) then
@@ -152,6 +162,7 @@ begin
     end
   else
     begin
+      //If this gun collides with the cat then this gun becomes the cat's gun
       if (collision(cat)) then
       begin
         if (cat^.gun^.gunType <> gunType) then
@@ -167,6 +178,7 @@ begin
         end;
       end;
 
+      //If the player is in range draw the gun name
       tempRadius := radius;
       radius := 150;
       if (collision(cat)) then drawName := true;
@@ -187,6 +199,7 @@ end;
 
 procedure TGun.finalUpdate;
 begin
+  //Draw the gun name if the cat is in range
   if (drawName) then
   begin
     bufferText(name_, x_, 20, z_, nameWidth/2, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
@@ -237,6 +250,7 @@ procedure TKittyGun.shoot;
 var
   tempBullet : PBullet;
 begin
+  //Create a new bullet and add it to the gameActors TList
   tempBullet := new(PBullet1, create(yRotation_, x_, z_));
   tempBullet^.setDamage(tempBullet^.getDamage*euphoriaBonus);
   gameActors.add(tempBullet);
@@ -264,6 +278,7 @@ begin
   TGun.update;
   if (visible_) then
   begin
+    //Draw a line if shooting
     if (lastShot < rateOfFire) then
       drawLine(x_, 13, z_, bulletLength, 2, -bulletRot+90, 0.2, 0.2, 0.2, 1.0);
     draw(true, true);
@@ -275,6 +290,7 @@ procedure TAkat.shoot;
 var
   tempGameActor : PGameActor = nil;
 begin
+  //This is a hitscan weapon, so do a hit scan and damage whatever the hit scan collides with
   bulletRot := rotation+((random(3)-1)*0.6);
   bulletLength := hitScan(x_, z_, bulletRot, RAY_MAX_LENGTH, tempGameActor);
   if (tempGameActor <> nil) then tempGameActor^.doDamage(3*euphoriaBonus);
@@ -310,6 +326,7 @@ var
   i : integer;
   tempBullet : PBullet;
 begin
+  //Create 6 bullets with a spread
   for i := 0 to 5 do
   begin
     tempBullet := new(PBullet1, create(yRotation_-2.5+i, x_, z_));
@@ -347,6 +364,7 @@ procedure TAntiMech.shoot;
 var
   tempBullet : PBullet;
 begin
+  //Create a rocket and add it to gameActors
   tempBullet := new(PRocket, create(yRotation_, x_, z_));
   tempBullet^.setDamage(tempBullet^.getDamage*euphoriaBonus);
   gameActors.add(tempBullet);

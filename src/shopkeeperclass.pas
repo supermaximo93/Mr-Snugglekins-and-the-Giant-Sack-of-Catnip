@@ -10,6 +10,7 @@ type
   shopkeeperSoundEnum = (WELCOME_SOUND, GOODBYE_SOUND, PURCHASE_SOUND);
   propEnum = (TABLE, TILL, HAT);
 
+  //The shopkeeper who talks to you
   PShopkeeper = ^TShopkeeper;
   TShopkeeper = object(TGameActor)
   private
@@ -22,6 +23,7 @@ type
     procedure talk(sound : shopkeeperSoundEnum);
   end;
 
+  //Static props for the shop
   PProp = ^TProp;
   TProp = object(TGameActor)
   public
@@ -129,6 +131,8 @@ begin
   end
 else
   begin
+    //If the shopkeeper has not exceeded the time he needs to say a phrase, make the
+    //mouth open and close
     timeSinceStartedTalking += compensation;
     timeSinceLastMouthRotation += compensation;
     if ((timeSinceStartedTalking >= timeToTalk-10) and (not mouthOpen)) then
@@ -177,7 +181,7 @@ begin
       end;
     PURCHASE_SOUND :
       begin
-        num := random(3);
+        num := random(3); //Pick a random phrase when the player purchases an item
         timeToTalk := PURCHASE_SOUND_TIME[num];
         purchaseSound[num]^.play(round(100*soundEffectsVolume), 1);
       end;

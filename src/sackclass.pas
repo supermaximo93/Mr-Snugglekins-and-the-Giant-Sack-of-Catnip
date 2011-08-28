@@ -7,6 +7,7 @@ interface
 uses GameActorClass;
 
 type
+  //The Giant Sack of Catnip
   PSack = ^TSack;
   TSack = object(TGameActor)
     constructor create(destX, destZ, newRotation : real);

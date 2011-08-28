@@ -6,6 +6,7 @@ interface
 
 uses GameActorClass;
 
+//A spawn point is a blue or red striped tube thing where the cat or spambots spawn from
 type
   PSpawnPoint = ^TSpawnPoint;
   TSpawnPoint = object(TGameActor)
@@ -17,6 +18,7 @@ type
     procedure spawn; virtual; abstract;
   end;
 
+  //Cat spawn points are blue
   PCatSpawnPoint = ^TCatSpawnPoint;
   TCatSpawnPoint = object(TSpawnPoint)
   public
@@ -27,6 +29,7 @@ type
     procedure spawn; virtual;
   end;
 
+  //Other spawn points are red
   PSpambotSpawnPoint = ^TSpambotSpawnPoint;
   TSpambotSpawnPoint = object(TSpawnPoint)
   public
@@ -36,6 +39,7 @@ type
     procedure spawn; virtual;
   end;
 
+  //A mech spawn point needs to be much bigger than the spawn points Drones and Hackers use
   PMechSpawnPoint = ^TMechSpawnPoint;
   TMechSpawnPoint = object(TSpawnPoint)
   public
@@ -99,13 +103,14 @@ begin
   time += compensation;
   if (time > 120) then time := 0;
 
-  pausedDraw;
+  pausedDraw; //Using the same drawing method for gameplay and pausing is fine
 end;
 
 procedure TCatSpawnPoint.pausedDraw;
 var
   texAlpha : real;
 begin
+  //Have a fading in and out effect by having the texture alpha vary by time
   if (time < 60) then texAlpha := time/60 else texAlpha := 1-((time*0.5)/60);
   tintShader^.use;
   tintShader^.setUniform4(EXTRA1_LOCATION, 0.4, 0.4, 1.0, texAlpha);
@@ -130,6 +135,8 @@ procedure TSpambotSpawnPoint.update;
 var
   randomness, num : integer;
 begin
+  //Increase the chance of a Spambot spawning by decreasing the range of values
+  //that the random function can pick from depending on the score
   randomness := 8;
   num := 120;
   repeat
@@ -160,6 +167,7 @@ end;
 
 procedure TSpambotSpawnPoint.spawn;
 begin
+  //Hackers are much rarer as they are extremely annoying and can turn the tides of the game against you easily
   case random(9) of
   0..7 : gameActors.add(new(PDrone, create(x_, z_)));
   8 : if (score >= HACKER_MINIMUM_SPAWN_SCORE) then gameActors.add(new(PHacker, create(x_, z_)));

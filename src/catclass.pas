@@ -92,6 +92,7 @@ begin
 
   if (not quit) then
   begin
+    //If any turrets are shooting at the player, tell them to stop
     if (turrets.count > 0) then
     begin
       for i := 0 to turrets.count-1 do
@@ -115,6 +116,7 @@ var
 begin
   if (not dead) then
   begin
+    //Tell the Spambots to stop trying to walk around something that no longer exists
     if (spambots.count > 0) then
     begin
       for i := 0 to spambots.count-1 do
@@ -141,6 +143,7 @@ begin
   timeSinceDeath += compensation;
   if (timeSinceDeath > 80) then dieFlag := true else
   begin
+    //Have a dissolve effect
     percentage := timeSinceDeath/80;
     dissolveShader^.bind;
     dissolveShader^.use;
@@ -161,6 +164,7 @@ begin
   timeSinceRespawn += compensation;
   if (timeSinceRespawn > 140) then respawning := false else
   begin
+    //Have a dissolve effect that forms the cat
     percentage := 1-(timeSinceRespawn/120);
     dissolveShader^.bind;
     dissolveShader^.use;
@@ -173,6 +177,8 @@ begin
     if (percentage < 0) then percentage := 0;
     shadowCircle^.draw(x_, 0, z_, yRotation, 0.3*(1-percentage), 0.3*(1-percentage));
   end;
+
+  //If the respawn animation has finished, set everything up ready for action!
   if (not respawning) then
   begin
     cat := @self;
@@ -215,6 +221,7 @@ begin
   rotate(0, -rotation+180, 0);
   setPosition(-xDistance, 0, -zDistance);
 
+  //If we're near a turret, allow the player to upgrade or hack it
   if (turrets.count > 0) then
   begin
     tempRadius := radius;
@@ -265,6 +272,7 @@ begin
            bufferText(TURRET_HEAL_TEXT, tempTurret^.x, 35, tempTurret^.z,
            turretHealTextWidthOverTwo, 0.1, 1.0, 1.0, 1.0,  1.0, tenneryBold);
 
+        //Turret stats
         bufferText('l', tempTurret^.x+cos(degToRad(rotation))*13, 28,
           tempTurret^.z+sin(degToRad(rotation))*13, 5, 0.1, 1.0, 1.0, 0.2, 1.0, pictosWeb);
 
@@ -286,6 +294,8 @@ begin
     end;
   end else if (trigger) then gun^.shootFlag := true;
 
+  //If we're in Euphoria mode, draw the cat with a yellow tint, a bit like Super Sonic from
+  //Sonic the Hedgehog ;-)
   tintShader^.use;
   if (euphoriaBonus > 1) then tintShader^.setUniform4(EXTRA1_LOCATION, 2.0, 2.0, 1.0, 1.0)
      else tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);

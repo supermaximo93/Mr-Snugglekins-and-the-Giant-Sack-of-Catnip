@@ -7,6 +7,7 @@ interface
 uses GameActorClass;
 
 type
+  //Bullets for the guns
   PBullet = ^TBullet;
   TBullet = object(TGameActor)
   protected
@@ -79,12 +80,15 @@ var
 begin
   setX(xSpeed, true);
   setZ(zSpeed, true);
+
+  //If the bullet is outside the map, destroy it
   if ((x_ < X_LOWER_BOUND) or (x_ > X_UPPER_BOUND) or (z_ < Z_LOWER_BOUND) or (z_ > Z_UPPER_BOUND)) then
   begin
     dieFlag := true;
     exit;
   end;
 
+  //If the bullet collides with anything, deal damage and destroy the bullet
   if (collidables.count > 0) then
   begin
     for i := 0 to collidables.count-1 do
@@ -140,6 +144,7 @@ var
 begin
   if (not quit) then
   begin
+    //Deal splash damage to anyone nearby the explosion
     for i := 0 to collidables.count-1 do
     begin
       tempGameActor := PGameActor(collidables[i]);
@@ -159,6 +164,7 @@ end;
 procedure TRocket.update;
 begin
   TBullet.update;
+  //Draw some smoke coming out of the rocket
   if (time = 0) then gameActors.add(new(PFloatSprite, create(smoke, x_, y_, z_, 0.1, 0, 10)));
   time += compensation;
   if (time > 2) then time := 0;

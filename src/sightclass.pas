@@ -7,6 +7,7 @@ interface
 uses dglOpenGL, GameActorClass;
 
 type
+  //The Sight is a line that is drawn in front of the player to help them aim
   PSight = ^TSight;
   TSight = object(TGameActor)
   public
@@ -41,6 +42,8 @@ begin
   x_ := -xDistance;
   z_ := -zDistance;
   xScale_ := hitScan(x_, z_, rotation, RAY_MAX_LENGTH, tempGameActor, false, true);
+  //Draw a line with the length from the hit scan. If the hit scan doesn't collide with anything,
+  //then make the line white, otherwise red
   if (tempGameActor <> nil) then drawLine(x_, y_, z_, xScale_, 1, yRotation_, 1.0, 0.0, 0.0, 1.0)
      else drawLine(x_, y_, z_, xScale_, 1, yRotation_, 1.0, 1.0, 1.0, 1.0);
 end;

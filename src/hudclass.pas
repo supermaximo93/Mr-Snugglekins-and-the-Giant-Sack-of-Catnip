@@ -7,6 +7,7 @@ interface
 uses GraphicalAssetClasses;
 
 type
+  //The heads up display that the player sees when the game is in action
   PHud = ^THud;
   THud = object
   private
@@ -49,6 +50,7 @@ var
   tempStr, clipSizeStr : string;
   i : integer;
 begin
+  //If the cat has just been damaged then make the screen flash red
   if (cat = nil) then
   begin
     timeSinceCatJustDamaged := 10;
@@ -61,6 +63,7 @@ begin
   whiteScreen^.draw(0, 0, -1, 0, skyXScale, skyYScale);
   if (timeSinceCatJustDamaged < 10) then timeSinceCatJustDamaged += compensation else timeSinceCatJustDamaged := 10;
 
+  //Draw the HUD
   healthSprite^.draw(0, screenHeight-133, -1);
   ammoSprite^.draw(screenWidth-247, screenHeight-133, -1);
   sackSprite^.draw(0, 0, -1);

@@ -7,6 +7,8 @@ interface
 uses GameActorClass;
 
 type
+  //Scenery are just static objects in the map that do nothing except block characters
+  //and projectiles
   PScenery = ^TScenery;
   TScenery = object(TGameActor)
   public
