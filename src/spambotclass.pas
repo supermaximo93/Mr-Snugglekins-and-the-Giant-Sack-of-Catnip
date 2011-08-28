@@ -466,6 +466,11 @@ procedure TDrone.update;
 begin
   TSpambot.update;
 
+  //If the Drone has run out of health then tell the game loop to destroy it,
+  //and create an explosion and floating score. This happens in the other spambots
+  //but is slightly different in each one, which is why this isn't in the general
+  //TSpambot.update method. (Although I suppose it would only take a few seconds to
+  //make it so it'll work fine in the TSpambot.update method... Excersize for the reader!)
   if (health < 1) then
   begin
     dieFlag := true;

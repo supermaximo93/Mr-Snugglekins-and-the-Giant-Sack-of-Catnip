@@ -1,5 +1,7 @@
 unit GlobalGameVariables;
 
+//This unit defines a lot of things that many units need at once
+
 {$mode objfpc}{$H+}
 {$define NO_BUTTON_LIMIT}
 interface
@@ -8,6 +10,7 @@ uses Classes, ShaderClass, TextureClass, GraphicalAssetClasses, FontClass, Sound
      GameActorClass, CatClass, SackClass, SightClass, HudClass, SpambotClass;
 
 const
+  //Use {$define TOP_DOWN} or {$define FIRST_PERSON} to try out top down and first person mode
   {$ifndef TOP_DOWN}
   {$ifndef FIRST_PERSON}
   VIEW_X_DIST = 0;
@@ -101,10 +104,10 @@ const
 
   SACK_HEALTH = 100000;
 
-  SPAMBOT_REWARD : array[DRONE..MECH] of integer = (10, 10, 50);
+  SPAMBOT_REWARD : array[DRONE..MECH] of integer = (10, 10, 50); //How much money you earn per kill
   TURRET_REWARD = 30;
 
-  MAX_HEARING_DISTANCE_SQAURED = 100000;
+  MAX_HEARING_DISTANCE_SQAURED = 100000;  //For sound effects
 
   MECH_MINIMUM_SPAWN_SCORE = 1000;
   HACKER_MINIMUM_SPAWN_SCORE = 500;
@@ -157,6 +160,7 @@ var
 procedure readHighScores;
 procedure game;
 
+//Sets up 3D and 2D views so that models and sprites can be rendered properly
 procedure setup3dMatrices(useDefault : boolean = false);
 procedure setup2dMatrices;
 
@@ -164,6 +168,7 @@ procedure drawFloor;
 
 procedure drawShadow(pClass : Pointer; shader : PShader; data : Pointer);
 
+//Detects button presses
 function up : boolean;
 function down : boolean;
 function left : boolean;
@@ -173,31 +178,42 @@ function anticlockwise : boolean;
 function trigger : boolean;
 function pause : boolean;
 
+//Tells OpenGL to start or stop rendering outlines, for the cartoony look
 procedure startOutline;
 procedure stopOutline;
 
+//Sets up and frees a buffer for vertex data to draw a line
 procedure initLines;
 procedure freeLines;
+//Draws a line in 3D space. Used for the sight to help you aim, and in the A-KAT gun
 procedure drawLine(x, y, z, length, thickness, rotation, r, g, b, a : real);
 
 //Need to buffer 3D text and sprites so that they can be drawn after models, so
-//that alpha blending works correctly
+//that alpha blending works correctly. I.e. If object A is translucent and B is not, and
+//you want to see object B through object A, object B MUST be drawn first
 procedure bufferText(text : string; x, y, z, originX, scale, r, g, b, a : real; fontToUse : PFont);
 procedure drawText;
 procedure bufferSprite(sprite : PSprite; x, y, z, scale, r, g, b, a : real);
 procedure drawSprites;
 
+//Does a hitscan down a line and if there was a collision, then the function returns
+//the distance to the object and a pointer to the object (through a VAR parameter)
 function hitScan(x, z, rotation, maxLength : real; var actor : PGameActor;
          onlyEnemies : boolean = false; ignoreCat : boolean = false) : real;
 
+//For you get killed by an enemy turret
 procedure setRespawnTimer;
 procedure respawn;
 
+//Binds the wear texture for dissolve and wear effects
 procedure bindDissolveMap;
+//Binds a texture for use with the alternateTexture shader
 procedure bindAlternateTexture(texture : PTexture);
 
+//Draw the world but don't update it. Used for the menu screen
 procedure drawStill;
 
+//Drop an item randomly for the player to pick up
 procedure randomDrop(x, z : real);
 
 implementation
@@ -217,6 +233,8 @@ type
     x, y, z, scale, r, g, b, a : real;
   end;
 
+  //A singleton class to manage the respawning of the player if they die. Is updated
+  //in the update loop like any other actor but doesn't have any visual presence
   PRespawnTimer = ^TRespawnTimer;
   TRespawnTimer = object(TGameActor)
   private
@@ -230,7 +248,7 @@ type
   end;
 
 var
-  lineVao, lineVbo : GLuint;
+  lineVao, lineVbo : GLuint; //buffers for line vertex data
   textBuffer : array[0..511] of textBufferRecord;
   spriteBuffer : array[0..511] of spriteBufferRecord;
   textBufferCount, spriteBufferCount : integer;
@@ -284,6 +302,8 @@ begin
     if (clockwise) then rotation += compensation*CAT_ROTATION_SPEED;
     {$endif}
     if (rotation < 0) then rotation += 360 else if (rotation >= 360) then rotation -= 360;
+    //Some trigonometry to make sure that when you press up/down/left/right the cat moves in that direction
+    //relative to it's own orientation, not the world's
     if (up) then
     begin
       newZDistance += cos(degToRad(rotation))*compensation*CAT_MOVEMENT_SPEED*euphoriaBonus;
@@ -307,6 +327,7 @@ begin
     cat^.setX(-newXDistance);
     cat^.setZ(-newZDistance);
 
+    //Collision checking so we don't walk through things
     if (collidables.count > 0) then
     begin
       for i := 0 to collidables.count-1 do
@@ -344,6 +365,8 @@ var
   i : word;
   tempGameActor : PGameActor;
 begin
+  //Bind the default drawing shader and loop through our objects, updating them,
+  //drawing them and disposing of ones that have their dieFlag set
   tintShader^.bind;
   tintShader^.use;
   tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);
@@ -388,6 +411,7 @@ begin
     i += 1;
   end;
 
+  //Second render to draw the cartoon outline
   startOutline;
   if (gameActors.count > 0) then
   begin
@@ -412,17 +436,21 @@ begin
   end;
   stopOutline;
 
+  //Draw our sprites and text last as they require alpha blending
   drawSprites;
   drawText;
 end;
 
 procedure euphoriaSequence;
+//This procedure does the Euphoria intro animation, when the player fills their Euphoria
+//meter when they destroy enough Spambots
 var
   tempRot, time, intensity : real;
   i : integer;
 begin
   tempRot := 0;
 
+  //Spin round to see the front of the cat
   repeat
     if (yDistance > 15) then yDistance := 15 else yDistance += compensation;
 
@@ -437,6 +465,7 @@ begin
     refreshScreen;
   until ((yDistance = 15) and (tempRot = 180));
 
+  //Play the lightning animation
   time := 0;
   cat^.setCurrentAnimation(1);
   euphoriaSequenceSound^.play(round(100*soundEffectsVolume));
@@ -482,7 +511,7 @@ begin
   until time > 120;
 
   cat^.setCurrentAnimation(0);
-
+  //Spin back round to the normal view
   repeat
     if (yDistance < 0) then yDistance := 0 else yDistance -= compensation;
 
@@ -511,6 +540,8 @@ begin
 end;
 
 procedure manageEuphoria;
+//If not in Euphoria mode, check our Euphoria meter and initiate Euphoria if necessary,
+//otherwise drain the Euphoria meter
 begin
   if (euphoriaBuildup >= 100) then
   begin
@@ -613,6 +644,8 @@ begin
 end;
 
 procedure loseSequence;
+//This great big procedure plays the animation of the sack exploding when you lose the game,
+//and then a game over screen appears
 type
   PList = ^TList;
   gameOverChar = record
@@ -625,6 +658,7 @@ type
     soundPlayed : boolean;
   end;
 
+  //The following procedures are very specific to this procedure
   procedure setup3dMatrices(x, y, z, xRot, yRot : real);
   begin
     setMatrix(MODELVIEW_MATRIX);
@@ -722,6 +756,7 @@ begin
   resetEvents;
   setup2dMatrices;
 
+  //Go through multiple viewpoints and make explosions
   xDistance := -sack^.x+150;
   yDistance := -200;
   zDistance := -sack^.z+150;
@@ -812,6 +847,7 @@ begin
   explosions.clear;
   explosions.destroy;
 
+  //Make each letter of GAME_OVER_TEXT fall from the top of the screen, and fade out to black
   time := 200;
   waitTime := 0;
   waited := false;
@@ -848,6 +884,7 @@ begin
     end;
   until time < 0;
 
+  //Show a breakdown of the statistics for the session
   breakdownRecords[0].text := 'Score breakdown';
   breakdownRecords[1].text := 'Drones: '+intToStr(SPAMBOT_REWARD[DRONE])+' x '
     +intToStr(spambotKills[DRONE])+' = '+intToStr(SPAMBOT_REWARD[DRONE]*spambotKills[DRONE]);
@@ -881,7 +918,7 @@ begin
   time := 0;
   waitTime := 15;
   currentChar := 1;
-  waited := false; //reuse of already declared variables, rather than wasting (a tiny amount) of memory
+  waited := false; //convenient reuse of already declared variables
   fade := true;
   fontShader^.use;
   fontShader^.setUniform4(EXTRA0_LOCATION, 1.0, 1.0, 1.0, 1.0);
@@ -912,6 +949,8 @@ begin
       end;
 
       tenneryBold^.write('Please enter your name:', 30, 320, -1, true, 0, 0.6, 0.6);
+      //Get user input for their name, making sure that there is a delay between each button
+      //press so that the user doesn't skip through loads of letters with only a quick press
       if (waitTime >= 15) then
       begin
         if (right) then
@@ -986,6 +1025,7 @@ begin
   setMousePosition(round(screenWidth/2), mouseY);
   {$endif}
 
+  //Play the game music and initialise variables
   music('game')^.play;
 
   paused := false;
@@ -1004,6 +1044,7 @@ begin
 
   setup2dMatrices;
 
+  //Run the game loop
   repeat
     manageEuphoria;
 
@@ -1075,7 +1116,7 @@ procedure drawFloor;
 var
   i, j : integer;
 begin
-  flatShader^.bind;
+  flatShader^.bind; //We don't need any shading on our floor, just draw the plain texture
   for i := 0 to 4 do
   begin
     for j := 0 to 4 do
@@ -1087,6 +1128,7 @@ begin
 end;
 
 procedure drawShadow(pClass : Pointer; shader : PShader; data : Pointer);
+//Draw a shadow in 3D space by applying 3D transforms and then drawing the sprite as normal
 begin
   if (shader <> nil) then
   begin
@@ -1220,13 +1262,14 @@ end;
 
 procedure startOutline;
 begin
+  //Bind the shader to draw outlines and set it's draw colour to black
   skeletonLineShader^.bind;
   skeletonLineShader^.use;
   skeletonLineShader^.setUniform4(TEXSAMPLER_LOCATION, 0.0, 0.0, 0.0, 1.0);
   glEnable(GL_CULL_FACE);
-  glCullFace(GL_FRONT);
-  glPolygonMode(GL_BACK, GL_LINE);
-  glLineWidth(2);
+  glCullFace(GL_FRONT);  //Cull the front face so we don't get outlines on the front of the model
+  glPolygonMode(GL_BACK, GL_LINE);  //Tell OpenGL to draw the triangles as lines instead of filled planes
+  glLineWidth(2);  //Line width needs to be greater than 1 to see the outline
 end;
 
 procedure stopOutline;
@@ -1246,6 +1289,7 @@ begin
     glBindVertexArray(lineVao);
   end;
 
+  //Generate a vertex buffer in graphics memory and put the vertex data into it
   glGenBuffers(1, @lineVbo);
   glBindBuffer(GL_ARRAY_BUFFER, lineVbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*length(vertexArray), @vertexArray, GL_STATIC_DRAW);
@@ -1416,6 +1460,10 @@ begin
 
   if (onlyEnemies) then tempList := @spambots else tempList := @collidables;
 
+  //Increment the position of the point to collision check with, and if it intersects
+  //with an object, then terminate. Decrease RAY_PRECISION for higher accuracy at the
+  //expense of performance, and increase for higher performance (although if it is
+  //too high, the ray might overshoot an object!)
   if (tempList^.count > 0) then
   begin
     while (result < maxLength) do
@@ -1460,7 +1508,7 @@ begin
 
   if (catSpawnPoints.count > 0) then
   begin
-    tempSpawnPoint := PSpawnPoint(catSpawnPoints[random(catSpawnPoints.count)]);
+    tempSpawnPoint := PSpawnPoint(catSpawnPoints[random(catSpawnPoints.count)]);  //Spawn at a random spawnpoint
     xDistance := -tempSpawnPoint^.x;
     zDistance := -tempSpawnPoint^.z;
     tempSpawnPoint^.spawn;
