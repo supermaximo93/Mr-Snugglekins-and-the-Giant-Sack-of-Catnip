@@ -19,9 +19,11 @@ type
     destructor destroy; virtual;
     procedure init;
     procedure pausedDraw; virtual;
-    procedure fireLevelUp;
-    procedure rangeLevelUp;
-    procedure healthLevelUp;
+
+    //Upgrades
+    procedure fireLevelUp; //Firing speed
+    procedure rangeLevelUp;  //Firing range
+    procedure healthLevelUp;  //Health
     procedure update; virtual;
     procedure shoot; virtual; abstract;
     function getTarget : PGameActor;
@@ -113,6 +115,7 @@ begin
   tempZDistance := zDistance;
   tempRot := 0;
 
+  //Change the cat model to the one that is holding a spanner
   cat^.setModel(catWithSpannerModel);
   cat^.setFrame(0);
   cat^.gun^.setVisibility(false);
@@ -132,6 +135,7 @@ begin
 
   whooshSound^.play(round(30*soundEffectsVolume));
 
+  //Spin round to face the turret and cat
   repeat
     if ((xDistance > -turret^.x-compensation*2) and (xDistance < -turret^.x+compensation*2))
        then xDistance := -turret^.x else
@@ -163,12 +167,15 @@ begin
   upgradeId := 0;
   timeFromSelect := 21;
 
+  //Upgrade menu loop
   repeat
+    //Animate the cat with the spanner
     cat^.setFrame(1, true);
     drawStill;
     drawSprites;
     setup2dMatrices;
 
+    //Switch through the different options, with a sliding animation when selecting
     if ((right or up) and (dist[upgradeId] = destDist[upgradeId])) then
     begin
       upgradeId += 1;
@@ -226,6 +233,7 @@ begin
       timeFromSelect := 0
     end;
 
+    //Draw the icons and text on the selections
     for i := 0 to EXIT_ID do
     begin
       destDist[i] := 180;
@@ -325,6 +333,7 @@ begin
         round((screenHeight/2)-cos(degToRad(i*72+252))*(dist[i]-180)), -1, i*72+162);
     end;
 
+    //Draw the price of the upgrade
     tempStr := '$';
     case upgradeId of
     FIRE_UPGRADE_ID : if (turret^.fireLevel < TURRET_MAX_LEVEL)then
@@ -345,6 +354,7 @@ begin
 
     drawText;
 
+    //Draw how much money you have
     fontShader^.use;
     fontShader^.setUniform4(EXTRA0_LOCATION, 0.0, 0.0, 0.0, 1.0);
     tenneryBold^.write('You have $'+intToStr(money),
@@ -361,6 +371,7 @@ begin
   tintShader^.use;
   tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);
 
+  //Spin round back to the normal position
   repeat
     if ((xDistance < tempXDistance+compensation*2) and
        (xDistance > tempXDistance-compensation*2)) then xDistance := tempXDistance else
@@ -410,6 +421,7 @@ begin
 
   if (not quit) then
   begin
+    //Tell the Spambots that this turret no longer exists
     if (spambots.count > 0) then
     begin
       for i := 0 to spambots.count-1 do
@@ -446,6 +458,7 @@ begin
   timeFromHackCompletion := 0;
   timeFromSmoke := 0;
 
+  //Tell the hackers that they might want to hack this turret
   if (spambots.count > 0) then
   begin
     for i := 0 to spambots.count-1 do
@@ -467,6 +480,7 @@ procedure TTurret.pausedDraw;
 var
   shaderToUse : PShader;
 begin
+  //Make sure the wear is drawn when the game is paused
   if (health < initialHealth/3) then
   begin
     shaderToUse := tintAndWearShader;
@@ -531,6 +545,7 @@ end;
 
 procedure TTurret.update;
   procedure reset;
+  //Work out which way to turn to get back to it's original rotation
   var
     diff1, diff2 : real;
   begin
@@ -553,6 +568,8 @@ var
 begin
   shaderToUse := tintShader;
 
+  //If the turret's health is less than 1, destroy it, and give or deduct points
+  //depending on whether the turret is on the enemy's team or not
   if (health < 1) then
   begin
     dieFlag := true;
@@ -572,6 +589,7 @@ begin
     end;
     exit;
   end else if (health < (initialHealth/3)*2) then
+  //Show some wear and puff smoke if the health is low
   begin
     timeFromSmoke += compensation;
     if (timeFromSmoke > 150) then
@@ -595,6 +613,7 @@ begin
 
   if (beingHacked) then
   begin
+    //Immobilise the turret if it's being hacked
     target := nil;
     lastShot := rateOfFire;
     timeFromHack += compensation;
@@ -604,6 +623,7 @@ else
   begin
     if (shooting) then
     begin
+      //If shooting, then follow the target until it hides behind an obstacle or dies
       if (target = nil) then
       begin
         shooting := false;
@@ -640,6 +660,7 @@ else
     end
   else
     begin
+      //Rotate the turret back and forth within a 90 degree arc
       setFrame(0);
       if (rotationFlag) then yRotation_ += TURRET_ROTATION_SPEED*compensation
          else yRotation_ -= TURRET_ROTATION_SPEED*compensation;
@@ -657,6 +678,7 @@ else
       begin
         if (hacked) then
         begin
+          //If hacked then hit scan for the cat
           if (cat <> nil) then
           begin
             hitScan(x_-(sin(degToRad(-yRotation_))*20), z_+(cos(degToRad(-yRotation_))*20),
@@ -665,6 +687,7 @@ else
           end;
         end
       else
+        //Otherwise hit scan for an enemy
         begin
           hitScan(x_-(sin(degToRad(-yRotation_))*20), z_+(cos(degToRad(-yRotation_))*20),
             -yRotation_+180, TURRET_RANGE*rangeLevel, target, true);
@@ -675,6 +698,7 @@ else
     if (lastShot < rateOfFire) then lastShot += compensation;
   end;
 
+  //If just damaged then flash red
   shaderToUse^.use;
   if (justDamaged) then
   begin
@@ -686,6 +710,7 @@ else
     shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 0.2, 0.2, 1.0);
   end
 else
+  //Make the turret purple if an enemy, otherise just blend white
   begin
     if (hacked) then shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 0.0+(hackAmount/TURRET_HACK_TIME),
        1.0, 1.0) else shaderToUse^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0-(hackAmount/TURRET_HACK_TIME), 1.0, 1.0);
@@ -721,12 +746,12 @@ var
   i : integer;
   tempSpambot : PSpambot;
 begin
-  if (not hackedThisFrame) then
+  if (not hackedThisFrame) then //Limit the hack speed (i.e. many hackers hack at the same speed as just one)
   begin
     hackAmount += compensation*2;
     beingHacked := true;
     timeFromHack := 0;
-    if (not hacked) then
+    if (not hacked) then  //If the turret is on the player's team then show a floating exclamation mark
     begin
       bufferText('!', x_, y_+30+sin(degToRad(hackAmount)*16)*2, z_, 1, 0.3, 1.0, 0.0, 0.0, 1.0, tenneryBold);
       hackedThisFrame := true;
@@ -738,6 +763,7 @@ begin
       beingHacked := false;
       timeFromHackCompletion := 0;
 
+      //Show a warning sign or 'Hacked!' depending on which team the turret was hacked to
       if (hacked) then gameActors.add(new(PFloatText, create('!', x_, y_+40, z_, pictosWeb, 1.0, 1.0, 0.0, 0.4))) else
       begin
         gameActors.add(new(PFloatText, create('Hacked!', x_, y_+40, z_, tenneryBold, 1.0, 1.0, 0.0)));
@@ -786,6 +812,7 @@ procedure TKittyTurret.shoot;
 var
   xDist, zDist, dist, volume : real;
 begin
+  //Add a bullet and play a sound if we can hear it
   gameActors.add(new(PBullet1, create(yRotation_, x_-(sin(degToRad(-yRotation_))*20),
     z_+(cos(degToRad(-yRotation_))*20))));
   if (cat <> nil) then
@@ -817,6 +844,7 @@ end;
 procedure TAkatTurret.update;
 begin
   TTurret.update;
+  //Draw a line because this is a hit scan turret
   if (lastShot < rateOfFire) then drawLine(x_-(sin(degToRad(-yRotation_))*20), 11,
     z_+(cos(degToRad(-yRotation_))*20), targetDistance, 2, yRotation_-90+((random(3)-1)*0.6),
     0.2, 0.2, 0.2, 1.0);
@@ -826,6 +854,7 @@ procedure TAkatTurret.shoot;
 var
   xDist, zDist, dist, volume : real;
 begin
+  //Do damage to the target automatically as we've already hit scanned, and play a sound
   target^.doDamage(3);
   if (cat <> nil) then
   begin

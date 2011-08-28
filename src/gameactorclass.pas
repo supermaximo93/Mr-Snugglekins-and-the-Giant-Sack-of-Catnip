@@ -9,18 +9,22 @@ uses GraphicalAssetClasses;
 type
   actorAttribute = (short, moveable, giant, hovering, castsShadow, rectangularShadow);
 
+  //The GameActor is basically anything in the game that is regularly updated and drawn
+  //in the update loop
   PGameActor = ^TGameActor;
   TGameActor = object(TGameObject)
   protected
-    health, initialHealth, radius, speed : real;
+    health, initialHealth, radius, speed : real; //Radius is for collisions
     justDamaged, visible_ : boolean;
     attributes : set of actorAttribute;
   public
     dieFlag : boolean;
+    //All assets must have destroy and update methods
     destructor destroy; virtual; abstract;
     procedure update; virtual; abstract;
+
     procedure pausedDraw; virtual;
-    function collision(other : PGameActor) : boolean;
+    function collision(other : PGameActor) : boolean; //Returns whether the actor collided with 'other'
     procedure doDamage(amount : real);
     function getRadius : real;
     procedure setRadius(newRadius : real);
@@ -32,7 +36,7 @@ type
     function isMoveable : boolean;
     function isGiant : boolean;
     function isHovering : boolean;
-    procedure updateVisibility;
+    procedure updateVisibility; //A frustum cull to help performance (never got round to completing it)
     procedure setVisibility(flag : boolean);
     function visible : boolean;
     procedure drawShadow;
@@ -48,6 +52,7 @@ begin
 end;
 
 function TGameActor.collision(other : PGameActor) : boolean;
+//A simple and quick circle collision test
 var
   xDist, zDist, dist, totalRadius : real;
 begin

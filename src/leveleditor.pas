@@ -1,5 +1,14 @@
 unit LevelEditor;
 
+{
+To use the level editor, select a piece by using L and J (look to the console for information on the
+piece). To move around the map, used the WASD keys. To place a piece, click the left mouse button.
+To delete a piece, right click it. Press ` (to the left of the 1 key) to load a map, and 1 to save a map
+(look to the console when saving and loading as it will prompt for input). The map can then be loaded in the
+game by going into the ButtonClass unit and finding the 'loadMap' procedures. Replace the string passed to one of
+these with your new map
+}
+
 {$mode objfpc}{$H+}
 
 interface
@@ -27,6 +36,7 @@ var
   ghostPiece : PGameActor = nil;
 
 procedure setupEditorMatrices;
+//Set the view to be top down and orthographic
 begin
   setMatrix(MODELVIEW_MATRIX);
   copyMatrix(ORTHOGRAPHIC_MATRIX, PROJECTION_MATRIX);
@@ -37,6 +47,7 @@ end;
 
 procedure placeMapPiece;
   function rotationToMouse(actor : PGameActor) : real;
+  //Calculates what rotation the piece should have depending on the mouse position
   var
     xDiff, zDiff : real;
   begin
@@ -54,6 +65,7 @@ var
   i : integer;
   collision : boolean = false;
 begin
+  //Create the map piece depending on what piece is selected
   case currentMapPiece of
   ROCK : newMapPiece := new(PRock, create(mouseX-xPos, -mouseY+zPos, 0));
   TREE : newMapPiece := new(PTree, create(mouseX-xPos, -mouseY+zPos, 0));
@@ -65,6 +77,7 @@ begin
   STATUE : newMapPiece := new(PStatue, create(mouseX-xPos, -mouseY+zPos, 0));
   SACK_OF_CATNIP :
     begin
+      //Only one sack can be on the map at a time
       if (placedPieces.count > 0) then
       begin
         for i := 0 to placedPieces.count-1 do
@@ -88,6 +101,7 @@ begin
 
   sleep(200);
 
+  //If the piece collides with a piece that has already been placed, destroy it (before the user notices)
   if (placedPieces.count > 0) then
   begin
     for i := 0 to placedPieces.count-1 do
@@ -107,6 +121,7 @@ begin
     newMapPieceEnum^ := currentMapPiece;
     placedPieceEnums.add(newMapPieceEnum);
 
+    //Allow the user to rotate the map piece before committing the placement
     repeat
       newMapPiece^.rotate(0, rotationToMouse(newMapPiece), 0);
 
@@ -145,6 +160,7 @@ end;
 
 procedure deleteMapPiece;
   function mouseCollision(actor : PGameActor) : boolean;
+  //Check if the piece is colliding with the cursor
   var
     xDist, zDist : real;
   begin
@@ -162,6 +178,7 @@ var
   tempGameActor : PGameActor;
   i : integer;
 begin
+  //Destroy any piece that is colliding with the cursor
   for i := 0 to placedPieces.count-1 do
   begin
     tempGameActor := PGameActor(placedPieces[i]);
@@ -171,6 +188,8 @@ end;
 
 procedure newGhostPiece;
 begin
+  //Create a map piece that follows the mouse and is translucent, to help the user
+  //place a piece in the correct place
   if (ghostPiece <> nil) then dispose(ghostPiece, destroy);
 
   case currentMapPiece of
@@ -259,6 +278,7 @@ begin
       readln(mapFile, tempStr);
       writeln('Loading map '''+tempStr+'''...');
 
+      //Go through the file creating the pieces as necessary
       repeat
         readln(mapFile, tempStr);
         mapPieceToLoad := mapPieceEnum(GetEnumValue(TypeInfo(mapPieceEnum), tempStr));
@@ -310,6 +330,7 @@ begin
   readln(mapName);
   if (not directoryExists('assets/maps')) then mkdir('assets/maps');
 
+  //If the file exists, confirm the overwrite
   if (fileExists('assets/maps/'+mapName+'.map')) then
   begin
     writeln('The file assets/maps/'+mapName+'.map already exists.');
@@ -325,6 +346,7 @@ begin
   assign(mapFile, 'assets/maps/'+mapName+'.map');
   rewrite(mapFile);
 
+  //Loop through the pieces and write the needed data to the file
   writeln(mapFile, mapName);
   for i := 0 to placedPieces.count-1 do
   begin
@@ -381,6 +403,7 @@ begin
     if (keyPressed(ord('1'))) then saveMap;
     if (keyPressed(ord('`'))) then loadMap;
 
+    //Move around the map
     if (keyPressed(ord('w'))) then zPos += compensation*5;
     if (keyPressed(ord('s'))) then zPos -= compensation*5;
     if (keyPressed(ord('a'))) then xPos += compensation*5;
@@ -393,6 +416,7 @@ begin
     tintShader^.use;
     tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 1.0);
 
+    //Draw the map pieces
     i := 0;
     collision := false;
     while (i < placedPieces.count) do
@@ -425,6 +449,7 @@ begin
       i += 1;
     end;
 
+    //Draw the ghost piece. If it is colliding with an already placed piece, then tint it red
     tintShader^.use;
     if (collision) then tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 0.0, 0.0, 0.4)
        else tintShader^.setUniform4(EXTRA1_LOCATION, 1.0, 1.0, 1.0, 0.4);

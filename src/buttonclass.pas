@@ -21,9 +21,9 @@ type
     constructor create(newText : string; destX, destY : integer; newSelectionProcedure : TProcedure;
                 newHoverProcedure : TProcedure = nil; newSize : real = 1.0);
     destructor destroy;
-    procedure hover;
-    procedure select;
-    procedure update;
+    procedure hover; //Highlight the button, calling a procedure if a procedure pointer was passed to the button on create
+    procedure select; //Call the procedure passed by a procedure pointer on create
+    procedure update; //Draw the button
   end;
 
 procedure initPauseMenuButtons;
@@ -76,6 +76,7 @@ var
 begin
   if (money < KITTY_TURRET_PRICE) then exit;
 
+  //Add the turret to the gameActors, and move it along if it's colliding with anything
   money -= KITTY_TURRET_PRICE;
   tempTurret := new(PKittyTurret, create(-tempXDistance+(sin(degToRad(-tempRotation+180))*40),
              -tempZDistance+(cos(degToRad(-tempRotation+180))*40), -tempRotation-180));
@@ -98,6 +99,7 @@ begin
     end;
   end;
 
+  //Make the shopkeeper say something and make a price float from the cash register
   shopkeeper^.talk(PURCHASE_SOUND);
   floatText.add(new(PFloatText, create('-$'+intToStr(KITTY_TURRET_PRICE), 14, 25, 0,
                                 tenneryBold, 1.0, 0.0, 0.0)));
@@ -109,6 +111,7 @@ var
   collision : boolean = true;
   i : integer;
 begin
+  //Same as before
   if (money < AKAT_TURRET_PRICE) then exit;
 
   money -= AKAT_TURRET_PRICE;
@@ -143,6 +146,7 @@ begin
   if (money < KITTYGUN_PRICE) then exit;
 
   money -= KITTYGUN_PRICE;
+  //Just place the gun at the player's feet as they'll pick it up automatically when they resume the game
   gameActors.add(new(PKittyGun, create(-tempXDistance, -tempZDistance)));
 
   shopkeeper^.talk(PURCHASE_SOUND);
@@ -191,6 +195,8 @@ var
   i : integer;
   tempGameActor : PGameActor;
 begin
+  //Unhighlight the other items and highlight this one. Highlights are done by scaling
+  //the item up to get a closer look
   shopText := 'Kitty Turret - $'+intToStr(KITTY_TURRET_PRICE);
   if (items.count > 0) then
   begin
@@ -331,9 +337,10 @@ var
   i : integer;
   greeted : boolean = false;
 begin
-  freeButtons;
+  freeButtons; //So the menu buttons don't interfere
   goBack := false;
 
+  //Add the shopkeeper and props, and move them about to the right positions
   shopkeeper := new(PShopkeeper, create(30, -8));
   shopkeeper^.rotate(0, -20, 0);
   props := TList.create;
@@ -412,7 +419,7 @@ begin
       begin
         if (time >= 120) then
         begin
-          shopkeeper^.setCurrentAnimation(0);
+          shopkeeper^.setCurrentAnimation(0); //Make the shopkeeper wave
           greeted := true;
           time := 0;
         end else time += compensation;
@@ -424,9 +431,10 @@ begin
     dunceDrone^.draw(false, true);
     dunceDrone^.drawShadow;
 
+    //Update floating text for when a price floats up from the till
     if (floatText.count > 0) then
     begin
-      for i := 0 to  floatText.count-1 do
+      for i := 0 to floatText.count-1 do
       begin
         tempGameActor := PGameActor(floatText[i]);
         tempGameActor^.update;
@@ -439,6 +447,7 @@ begin
       tempGameActor^.update;
     end;
 
+    //Zoom in/out the items for sale gradually based on a destination scale
     tintShader^.bind;
     for i := 0 to items.count-1 do
     begin
@@ -460,7 +469,7 @@ begin
       tempGameActor^.draw(true, true);
     end;
 
-
+    //Redraw the scene as an outline
     startOutline;
     shopkeeper^.draw(false, true);
     dunceDrone^.draw(false, true);
@@ -491,6 +500,7 @@ begin
     {$endif}
     updateButtons;
 
+    //Show how much money the player has
     fontShader^.use;
     fontShader^.setUniform4(EXTRA0_LOCATION, 0.0, 0.0, 0.0, 1.0);
     tenneryBold^.write(shopText, round((screenWidth*0.5)-(tenneryBold^.width(shopText)*0.5)),
@@ -506,6 +516,7 @@ begin
   zDistance := tempZDistance;
   rotation := tempRotation;
 
+  //Free the shop stuff
   dispose(shopkeeper, destroy);
   dispose(dunceDrone, destroy);
 
@@ -538,7 +549,7 @@ end;
 
 procedure forfeit;
 begin
-  sack^.doDamage(SACK_HEALTH);
+  sack^.doDamage(SACK_HEALTH);  //Set the sack health to something <= 0
   resumeGame;
 end;
 
@@ -581,6 +592,7 @@ begin
 
     setup2dMatrices;
 
+    //Draw a translucent black background to give the menu a faded look
     fontShader^.use;
     fontShader^.setUniform4(EXTRA0_LOCATION, 0.0, 0.0, 0.0, 0.6);
     whiteScreen^.draw(0, 0, -1, 0, skyXScale, skyYScale);
@@ -624,7 +636,7 @@ end;
 
 procedure options;
 begin
-
+  //Never got round to doing this
 end;
 
 procedure initMainMenuButtons;
