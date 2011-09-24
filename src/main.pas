@@ -20,9 +20,19 @@ Stability & lack of bugs; Innovation & Creativity; Fun Factor. This game came fo
 and came first place without button bonuses!
 For full results, see here: http://www.pascalgamedevelopment.com/content.php?263-1st-PGD-Challenge-Final-Results
 
+Most of the assets for the game, including the 3D models, music and shaders were created by myself. The only assets that were
+not created by me was the fonts (which I have purchased rights to) and sound effects (although I did make the shopkeeper voiceovers)
+
 Uses OpenGL and SDL with the SuperMaximo GameLibrary, also created by myself. To see the latest
 source code for it (and my other projects), go to my Github page at  https://github.com/supermaximo93
-The version used in this game is an older version.
+The version used in this game is an older version (the new version is loaded from a DLL and goes about things differently.
+I will be writing documentation and tutorials soon!), and cannot really be used to make 3D games without the requred
+animation program. The animation program this version uses is really horrible. I have since rewritten it, but the output
+files are different and are not compatible with this version of the library. To see the new version in action (which also uses the
+new version of the library) go to http://www.youtube.com/watch?v=AuwnKSFa8y0
+
+(Also, the reason I use Objects instead of Classes is that I like the syntax a bit better, and they allow me to call constructors/
+destructors of superclasses like a regular method without actually creating a new instance)
 
 NOTE ABOUT OPENGL:
 The OpenGL code used in this game and in the SuperMaximo GameLibrary does not use the fixed function graphics pipeline, but
