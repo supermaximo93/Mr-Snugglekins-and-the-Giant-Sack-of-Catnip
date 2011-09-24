@@ -798,7 +798,11 @@ begin
     begin
       hover;
       buttonId := buttons.indexOf(@self);
-      if (mouseLeft) then select;
+      if (mouseLeft and (timeFromSelect >= SELECTION_DELAY)) then
+      begin
+        select;
+        timeFromSelect := 0;
+      end;
     end else hovering := false;
   end else hovering := false;
   {$endif}

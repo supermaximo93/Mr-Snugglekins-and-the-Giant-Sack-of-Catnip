@@ -98,7 +98,7 @@ const
   RESPAWN_VIEW_X_DIST = 100;
   RESPAWN_VIEW_Y_DIST = -100;
   RESPAWN_VIEW_Z_DIST = -400;
-  RESPAWN_VIEW_ANGLE = 30;
+  RESPAWN_VIEW_ANGLE = 20;
 
   A_LOT_OF_MONEY = 10000;
 
@@ -1087,6 +1087,7 @@ begin
   begin
     translateMatrix(RESPAWN_VIEW_X_DIST, RESPAWN_VIEW_Y_DIST, RESPAWN_VIEW_Z_DIST);
     rotateMatrix(RESPAWN_VIEW_ANGLE, 1, 0, 0);
+    rotateMatrix(90, 0, 1, 0);
   end
 else
   begin
